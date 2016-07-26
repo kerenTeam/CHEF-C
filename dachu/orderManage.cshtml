@@ -1,0 +1,193 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/common.css" />
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var phone = "";
+        $(function () {
+            getphone()
+            getorder()
+        })
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                }
+            })
+        }
+        function getorder() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_POOrder/getOrderByPhone", { phone: phone }, function (data) {
+                $.each(data, function (i) {
+                    var orderstate = "";
+                    var orderInfo = "";
+                    if (data[i].state == 0) {
+                        orderstate = "订单未付款";
+                    }
+                    if (data[i].state == 1) {
+                        orderstate = "订单待分配";
+                    }
+                    if (data[i].state == 2) {
+                        orderstate = "订单待接单";
+                    }
+                    if (data[i].state == 3) {
+                        orderstate = "订单服务中";
+                    }
+                    if (data[i].state == 4) {
+                        orderstate = "订单已出发";
+                    }
+                    if (data[i].state == 5) {
+                        orderstate = "订单有问题";
+                    }
+                    if (data[i].state == 6) {
+                        orderstate = "订单待出库";
+                    }
+                    if (data[i].state == 7) {
+                        orderstate = "订单退款中";
+                    }
+                    if (data[i].state == 8) {
+                        orderstate = "订单待评论";
+                    }
+                    if (data[i].state == 9) {
+                        orderstate = "订单已评论";
+                    }
+                    
+                    str += "<div class='am-list-news-bd am-margin-bottom-xs bwhite'><p class='am-padding-vertical-sm orderTit'><img src='/Content/img/marks.png' class='marks' alt=''><span>" + orderstate + "</span><a onclick='sure(this,\"" + data[i].poorderid + "\")' class='am-fr'><img src='/Content/img/trash.png' class='trashR' alt=''></a></p><ul class='am-list odl odM'><li class='am-g am-list-item-dated am-padding am-text-lg black'><div>联系人：" + data[i].name + "<span id='name'></span></div><div>联系电话：<span id='phone'>" + data[i].goodsphone + "</span></div><div>服务时间：<span id='yuyue'>" + new Date(data[i].appointmenttime).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '') + "</span></div><div>服务地点：<span id='address'>" + data[i].address + "</span></div></li>";
+
+                    AjaxJson("/CommonModule/Q_POOrder/getOrderEntryByOrderId", { orderid: data[i].poorderid }, function (ordereEntry) {
+                        $.each(ordereEntry, function (j) {
+                            if (ordereEntry[j].foodid!=null) {
+                                orderInfo += "<li class='am-padding-sm'><a onclick='hrefFoodInfo(\"" + ordereEntry[j].foodid + "\")' class='vimg'><img alt='' src='" + ordereEntry[j].thumbnail + "' class='orderImg'></a><span class='orderName'>" + ordereEntry[j].foodname + "</span><span class='black'>X " + ordereEntry[j].foodnumber + "<span class='am-margin-left orderPrice'><i class='am-icon-cny'></i>" + ordereEntry[j].foodmoney + " </span></span></li>";
+                            }
+                        })
+                        str = str + orderInfo;
+                    })
+                    str = str + "<li class='am-g am-list-item-dated am-padding-vertical-sm'><span class='am-fr gray'>更多...</span></li><li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd red'>订单总计:</a><span class='am-list-date ath'><i class='am-icon-cny red' id='money'>" + data[i].amount + "</i></span></li><li class='am-g am-list-item-dated'></li></ul><div class='am-cf am-padding-sm orderDetail'><span class='am-fl am-text gray'>订单编号 " + data[i].billno + "</span><a onclick='hrefInfo(\"" + data[i].poorderid + "\")' class='white am-fr'>点击查看详情</a></div></div>";
+                })
+            })
+            if (str == "") {
+                str = "<div class='am-padding-sm am-text-center'>您暂无订单!</div>"
+            }
+            $("#order").html(str);
+        }
+        //跳转订单详情面
+        function hrefInfo(id) {
+            window.location.href = "orderInfo?id=" + id;
+        }
+        function hrefFoodInfo(id) {
+            window.location.href = "foodInfo?foodid=" + id;
+        }
+    </script>
+
+
+
+</head>
+
+<body class="pabo">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="personal">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            订单管理
+        </h1>
+    </header>
+    <div id="order">
+
+    </div>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">联系客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal" class="active">
+                    <span class=""><img src="/Content/img/gr2.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 删除提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">您确定要删除吗？</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                <button type='button' class="bno beee whtie closem">取消</button>
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script>
+    var orderid = "";
+    function sure(obj, id) {
+        $('.tk').fadeIn('fast');
+        orderid = id;
+    }
+    $('.closem').click(function () {
+        $('.tk').fadeOut('fast');
+    });
+    $('#sub').click(function () {
+        $('.tk').fadeOut('fast');
+        getAjax("/CommonModule/Q_POOrder/Display", { orderid: orderid }, function (data) {
+            if (data == 1) {
+                //alert("删除成功")
+                window.location.reload()
+            }
+            else {
+                alert(data);
+                alert("删除失败")
+            }
+        })
+    });
+</script>
+</html>

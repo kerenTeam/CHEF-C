@@ -1,0 +1,177 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>地址管理</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/app.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <link href="/Content/css/personal.css" rel="stylesheet">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        var phone = "";
+        var state = GetQuery("state");
+        $(function () {
+            getphone()//获取电话
+            getAddress()//获取地址
+            if (state == "") {
+               // $('.my_checke').css('display', 'none');
+                $('.my_checke input').remove()
+                $('.tipadd').css('display', 'none');
+            } 
+        })
+
+        //获取电话
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    //signin();
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                }
+            })
+        }
+
+        //获取地址
+        function getAddress() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_MemberAddress/GetAddressAllByPhone", { userphone: phone }, function (data) {
+                $('#address').css('display', 'none');
+                $.each(data, function (i) {
+                    $('#address').css('display', 'block');
+                    str += "<li><div class='add_list_t'><label class='my_checke'><input type='checkbox' onclick='click1(\"" + data[i].memberaddressid + "\")'  name=''><i>图</i></label><span>" + data[i].name + "  " + data[i].goodsphone + "</span><a onclick='del(\"" + data[i].memberaddressid + "\")'> <img src='/Content/images/del_new_03.png' alt=''> 删除</a><a onclick='changeAdd(\"" + data[i].memberaddressid + "\")'> <img src='/Content/images/del_new_06.png'> 编辑</a></div><div class='add_list_f'>" + data[i].address + "</div></li>";
+                })
+                $("#address").html(str);
+            })
+        }
+
+        //跳转编辑地址
+        function changeAdd(id) {
+            window.location.href = 'changeAdd?id=' + id;
+        }
+
+        function hrefAddAddress() {
+            if (state=="") {
+                window.location.href = "addAddress";
+            }
+            else {
+                window.location.href = "addAddress?state=1";
+            }
+           
+        }
+
+
+        function click1(id) {
+            $.cookie("address", id);
+            setTimeout(function () { window.location.href = 'order' }, 1);
+        }
+    </script>
+</head>
+<body class="paddfoot">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            选择地址
+        </h1>
+    </header>
+    <div class="address_list">
+        <form>
+            <div class="tipadd gray am-padding-top-sm am-text-center" style="display:block;margin-bottom: -1rem;">请勾选本次服务地址</div>
+            <ul id="address"></ul>
+
+            <div class="add_add">
+                <a onclick="hrefAddAddress()">
+                    <img src="/Content/images/adddizhi_03.png" alt="">
+                    新增地址
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="#">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 登录提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">确定删除吗？</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                <button type='button' class="bno beee whtie closem closetk">取消</button>
+                <button type='button' id="sub" class="bno bred white closem ok">确定</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script>
+    var addressid = '';
+    function del(id) {
+        $('.tk').css('display', 'block');
+        addressid = id;
+    }
+    $('.closetk').on('click', function () {
+        $('.tk').css('display', 'none');
+    })
+    $('.ok').on('click', function () {
+        getAjax("/CommonModule/Q_MemberAddress/delAddress", { id: addressid }, function (data) {
+            if (data == 1) {
+              //  alert("删除成功");
+                window.location.reload();
+            }
+            else {
+                alert("删除失败");
+            }
+        })
+    })
+</script>
+</html>

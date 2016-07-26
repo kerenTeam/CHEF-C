@@ -1,0 +1,603 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/common.css" />
+    @*<script src="/Content/js/jquery.min.js"></script>*@
+    @*<script src="~/Content/js/jquery-2.1.1.min.js"></script>*@
+    <script src="~/Content/js/jquery-1.8.0.min.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/amazeui.min.js"></script>
+    <script type="text/javascript" src="/Content/js/date.js"></script>
+    <script type="text/javascript" src="/Content/js/iscroll.js"></script>
+    <script>
+        var phone = "";
+        var moneyalls = 0;
+        var fuwufei = 0
+        $(function () {
+            fuwufei = $.cookie("FuwuMoney");
+            getInfo();//加载订单
+            getphone();//获取电话
+            getCoupon();//加载优惠券
+            getIntegral();//加载积分
+            getCouponCookie(); //加载已选优惠券
+            getAddress();//加载地址
+        })
+        //获取电话
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                }
+            })
+        }
+        //加载订单
+        function getInfo() {
+            var food = "";
+            var foods;
+            var cele = "";
+            var celes;
+            var dinner = "";
+            var dinners;
+            var waiter = "";
+            var waiters;
+            var foodmoney = 0;
+            var waitermoney = 0;
+            var celemoney = 0;
+            var dinnermoney = 0;
+            var all = "";
+            if ($.cookie("Food") != null) {
+                food = $.cookie("Food");
+                foods = eval('(' + food + ')');
+                $.each(foods, function (i) {
+                    if (foods[i].Number != 0) {
+                        AjaxJson("/CommonModule/Q_Food/getInfoByFoodId", { foodid: foods[i].FoodId }, function (data) {
+                            $.each(data, function (j) {
+                                all += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>" + data[j].foodname + " <span class='am-fr'>X " + foods[i].Number + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>" + data[j].foodprice + " </span></li>";
+                            })
+                        })
+                    }
+                })
+                foodmoney = $.cookie("FoodMoney");
+            }
+            if ($.cookie("Waiter") != null) {
+                waiter = $.cookie("Waiter");
+                waiters = eval('(' + waiter + ')');
+                $.each(waiters, function (i) {
+                    if (waiters[i].Number != 0) {
+                        if (waiters[i].FoodId == 1) {
+                            all += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>男服务员 <span class='am-fr'>X " + waiters[i].Number + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>80 </span></li>";
+                        }
+                        else if (waiters[i].FoodId == 2) {
+                            all += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>女服务员 <span class='am-fr'>X " + waiters[i].Number + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>80 </span></li>";
+                        }
+                        else {
+                            all += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>餐具 <span class='am-fr'>X " + waiters[i].Number + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>80 </span></li>";
+                        }
+                    }
+                })
+                waitermoney = $.cookie("WaiterMoney");
+            }
+            if ($.cookie("Cele") != null) {
+                cele = $.cookie("Cele");
+                celes = eval('(' + cele + ')');
+                $.each(celes, function (i) {
+                    if (celes[i].Number != 0) {
+                        AjaxJson("/CommonModule/Q_details/getMessageById", { id: celes[i].FoodId }, function (data) {
+                            $.each(data, function (j) {
+                                all += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>" + data[j].name + " <span class='am-fr'>X " + celes[i].Number + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>" + data[j].price + " </span></li>";
+                            })
+                        })
+                    }
+                })
+                celemoney = $.cookie("CeleMoney");
+            }
+            if ($.cookie("Dinner") != null) {
+                dinner = $.cookie("Dinner");
+                dinners = eval('(' + dinner + ')');
+                $.each(dinners, function (i) {
+                    if (dinners[i].Number != 0) {
+                        AjaxJson("/CommonModule/Q_Dinner/getDinnerById", { id: dinners[i].FoodId }, function (data) {
+                            $.each(data, function (j) {
+                                all += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>" + data[j].title + " <span class='am-fr'>X " + dinners[i].Number + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>" + data[j].sprice + " </span></li>";
+                            })
+                        })
+                    }
+                })
+                dinnermoney = $.cookie("DinnerMoney");
+            }
+            moneyalls = parseFloat(foodmoney) + parseFloat(celemoney) + parseFloat(dinnermoney) + parseFloat(waitermoney) + parseFloat(fuwufei);
+            if (fuwufei!=0) {
+                all = all + "<li>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;服务费￥" + fuwufei + "</li>"
+            }
+            var allhtml = all + "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd'>订单总计:</a><span class='am-list-date ath'><i class='am-icon-cny' id='money'>" + moneyalls + "</i></span></li>"
+            $("#all").html(allhtml)
+        }
+        //加载优惠券
+        function getCoupon() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_UserCoupon/getCouponByPhone", { phone: phone, money: moneyalls }, function (Coupon) {
+                if (Coupon.length == 0) {
+                    $("#noConpon1").css("display", "none");
+                }
+                else {
+                    $("#noConpon").css("display", "none");
+                    $.each(Coupon, function (i) {
+                        str += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '><img src='" + Coupon[i].img + "' class='cardimg'>" + Coupon[i].coupponname + "</a><input type='hidden' name='usercouponid' value='" + Coupon[i].usercouponid + "' id='couponid' /><span class='am-list-date ath'> <i class='am-icon-cny'>" + Coupon[i].coupponmoney + "</i></span><input id='menkan' type='hidden' value='" + Coupon[i].usethreshold + "'/></li>";
+                    })
+                    str =str+ "<li class='am-g am-list-item-dated' onclick='qingchucoupon()'><a href='javascript:' class='am-list-item-hd '>不使用优惠券</a><span class='am-list-date ath'></span></li>";
+                    $("#coupon").html(str);
+                    $("#number").html(Coupon.length);
+                }
+            })
+        }
+
+        function  qingchucoupon() {
+            $.cookie("Coupon", null);
+        }
+        //加载积分
+        function getIntegral() {
+            AjaxJson("/CommonModule/Q_Users/getInfoByPhone", { phone: phone }, function (data) {
+                $.each(data, function (i) {
+                    if (data[i].integral == 0) {
+                        $("#integral1").css("display", "none");
+                    }
+                    else {
+                        $("#integral").css("display", "none");
+                        $("#diyong").html(data[i].integral)
+                      //  $("#jifenmoney").html(parseFloat(data[i].integral)/100)
+                    }
+
+                })
+            })
+        }
+
+        //加载已选优惠券
+        function getCouponCookie() {
+            var coupon = "";
+            var payable = moneyalls;
+            console.log($.cookie("jifenmoney"))
+            if ($.cookie("jifenmoney") == null) {
+                $('#jifen').attr('checked', false)
+            } else if ($.cookie("jifenmoney") == 0) {
+                $('#jifen').attr('checked', false)
+            }
+            else {
+                $('#jifen').attr('checked', true)
+                dijifen = $('#diyong').text(); 
+                jine = dijifen / 100; 
+                if (jine > payable) {
+                    jine = payable
+                    payable = 0;
+                    $('#jifenmoney').text(moneyalls.toFixed(2));
+                }
+                else {
+                    payable = (moneyalls - $.cookie("jifenmoney")).toFixed(2); 
+                    $('#jifenmoney').text(jine.toFixed(2));
+                } 
+            }
+
+            if ($.cookie("Coupon") != null) {
+                coupon = $.cookie("Coupon");
+
+                AjaxJson("/CommonModule/Q_UserCoupon/getUseCouponByCouponId", { id: coupon }, function (data) {
+                    $.each(data, function (i) {
+                        $('.fclick').html('抵用券<span class="am-fr am-icon-xs">' + data[i].coupponname + '<input type="hidden" name="couponid" value="' + data[i].usercouponid + '" /><span class="am-icon-cny" id="youhui" >' + data[i].coupponmoney + '</span></span>');
+                        discount = data[i].coupponmoney;
+                        payable = (moneyalls - discount - $.cookie("jifenmoney")).toFixed(2);
+                        if (payable < 0) {
+                            payable = 0;
+                        }
+
+                        $('#yfje').val(payable);
+                    })
+                })
+            }
+            $('#pricetotal').html(payable);
+        }
+
+        //加载地址
+        function getAddress() {
+            console.log($.cookie("address"));
+            var str = "";
+            if ($.cookie("address") != null) {
+                AjaxJson("/CommonModule/Q_MemberAddress/getInfoById", { id: $.cookie("address") }, function (data) {
+                    $.each(data, function (i) {
+                        str += "<li class='am-g am-list-item-dated lpt2 mbtop'><a onclick='hrefAddress()' class='am-list-item-hd black adda'><div class='am-margin-top-sm'>" + data[i].name + "&nbsp;&nbsp;" + data[i].goodsphone + "<br></div>" + data[i].address + "</a></li>"
+                    })
+                })
+            }
+            str += "<a onclick='hrefAddress()' class='am-cf adc'>选择服务地址 <span class='am-icon-angle-right am-fr  am-icon-sm'></span></a>"
+            $("#address").html(str)
+        }
+        //提交订单返回金额
+
+        function hrefAddress() {
+            window.location.href = "Address?state=" + 1;
+        }
+    </script>
+</head>
+
+<body>
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="cart">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            订单
+        </h1>
+    </header>
+    <form action="" method="post">
+        <div class="am-list-news-bd bwhite">
+            <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>我的订单</span></p>
+            <ul class="am-list odl" id="all"></ul>
+            <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>我的优惠</span></p>
+            <div class="fpa2">
+                <a class="am-cf adc" id="noConpon">抵用券<span class="am-fr am-icon-xs">无可用抵用券 </span></a>
+                <a class="adc fclick" id="noConpon1">抵用券(<span id="number"></span>)<span class="am-fr am-icon-xs">选择 <span class="am-icon-angle-down"></span></span></a>
+                <div class="am-list-news-bd" id="fpc" style="display: none">
+                    <ul class="am-list odl" id="coupon"></ul>
+                </div>
+                <!-- 积分 -->
+                <a href="javascript:;" id="integral" class="am-cf adc">积分<span class="am-fr am-icon-xs">你还没有积分!</span></a>
+                <a href="javascript:;" id="integral1" class="am-cf adc">积分<span class="am-fr am-icon-xs"><span id='diyong'></span>积分可抵用  <span class="am-icon-cny" id='jifenmoney'></span> <input type="checkbox" name='jifen' id="jifen" onclick="jfclick()"></span></a>
+            </div>
+            <input type="hidden" name='yfje' value="0" id='yfje'>
+            <p class="am-padding-vertical-sm am-cf orderTit">
+                <img src="/Content/img/marks.png" class="marks" alt="">
+                <quote class="am-fr am-margin-right red">实付金额<i class="am-icon-xs am-icon-cny red" id='pricetotal'></i></quote>
+            </p>
+            <div class="waveBg">
+
+            </div>
+        </div>
+        <!-- <hr data-am-widget="divider" style="" class="am-divider am-divider-dashed" /> -->
+        <div class="bwhite am-margin-vertical-sm">
+            <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>服务地址</span></p>
+            <!-- 已选择过地址 -->
+            <ul class="am-list am-margin-top addressServ" id="address">
+                @*<a onclick="hrefAddress()" class="am-cf adc">选择服务地址 <span class="am-icon-angle-right am-fr  am-icon-sm"></span></a>*@
+            </ul>
+
+            <div class="waveBg">
+
+            </div>
+        </div>
+        </div>
+        <!-- 用餐时间 -->
+        <div class="bwhite am-margin-vertical-sm">
+            <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>服务时间</span></p>
+            <div class="inform am-margin-horizontal am-margin-bottom am-padding-xs am-text-center">
+                请选择用餐时间
+            </div>
+            <div class="demo am-margin-sm">
+                <div class="lie">
+                    日期:<input id="beginTime" class="kbtn am-radius" name='riqi' required />
+                </div>
+            </div>
+            <div id="datePlugin"></div>
+            <div class="am-margin-sm">
+                <span class="am-fl">时间:</span><br>
+                <input type="hidden" id="timeEat" name='time' value="">
+                <table class="am-table am-table-bordered timeTable">
+                    <tr>
+                        <td>10:00</td>
+                        <td>11:00</td>
+                        <td>11:30</td>
+                        <td>12:00</td>
+                    </tr>
+                    <tr>
+                        <td>12:30</td>
+                        <td>13:00</td>
+                        <td>14:30</td>
+                        <td>15:00</td>
+                    </tr>
+                    <tr>
+                        <td>16:00</td>
+                        <td>17:00</td>
+                        <td>17:30</td>
+                        <td>18:00</td>
+                    </tr>
+                    <tr>
+                        <td>18:30</td>
+                        <td>19:00</td>
+                        <td>19:30</td>
+                        <td>20:00</td>
+                    </tr>
+                </table>
+            </div>
+            <button type="button" id="pay" class="am-btn bred os">去支付</button>
+            <div class="waveBg">
+
+            </div>
+        </div>
+    </form>
+
+    <!-- 时间提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red content"></div>
+                </div>
+            </div>
+            <div class="btnGp">
+                @* <button type='button' class="bno beee whtie closem">取消</button>*@
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
+
+<script>
+    var amount;
+    var payable;
+    var jine;
+    var discount = 0;
+    var dijifen;
+    var jifenmoney = 0;
+
+    $(function () {
+
+      
+        amount = $('#money').text(); 
+        payable = amount;
+        //总金额 
+     //   $('#yfje').val(payable);
+        jifenmoney = 0;
+        // 积分
+        dijifen = $('#diyong').text();
+        jine = dijifen / 100;
+        if (jine > payable) {
+            jine = payable
+            payable = 0;
+            $('#jifenmoney').text(moneyalls.toFixed(2));
+        }
+        else {
+            payable = (moneyalls - payable).toFixed(2);
+            $('#jifenmoney').text(jine.toFixed(2));
+        }
+
+
+        console.log(dijifen);
+        var adate = $('#beginTime');
+        var html;
+        var date = new Date();
+        var month = date.getMonth() + 1;
+        var m = (month < 10) ? '0' + month : month;
+        month = m;
+        var day = date.getDate();
+        var d = (day < 10) ? '0' + day : day;
+        day = d;
+        var year = date.getFullYear();
+        var hour = date.getHours();
+        var h = (hour < 10) ? '0' + hour : hour;
+        hour = h;
+        var minutes = date.getMinutes();
+        var b = (minutes < 10) ? '0' + minutes : minutes;
+        minutes = b;
+        var curTime = hour + 2 + ":" + minutes;
+        html = year + '-' + month + '-' + day;
+        adate.attr('placeholder', html + " 默认");
+        adate.val(html);
+        console.log(html);
+
+
+        $('.fclick').click(function () {
+
+            $('#fpc').slideToggle(400);
+        });
+        $('#fpc li:not(:last)').click(function () {
+            $('#fpc').slideUp(400);
+            $('.fclick').empty();
+            $('.fclick').html('抵用券<span class="am-fr am-icon-xs">' + $(this).find('.am-list-item-hd').text() + '<input type="hidden" name="couponid" value="' + $(this).find('#couponid').val() + '" /><span class="am-icon-cny" id="youhui" >' + $(this).find('.am-icon-cny').html() + '</span></span>');
+            discount = $('#youhui').text();
+            $.cookie("Coupon", $(this).find('#couponid').val());
+            payable = (amount - discount - jifenmoney).toFixed(2);
+            if (payable < 0) {
+                payable = 0;
+            }
+            $('#pricetotal').text(payable);
+            $('#yfje').val(payable);
+
+        });
+        $('#fpc li:last').click(function () {
+            $('#fpc').slideUp(400);
+            var backQuan = $('.fclick').find('#youhui').html();
+            payable = (amount - jifenmoney).toFixed(2);
+            if (payable < 0) {
+                payable = 0;
+            }
+            $('#pricetotal').text(payable);
+            $('#yfje').val(payable);
+            $('.fclick').html('抵用券<span class="am-fr am-icon-xs">选择 <span class="am-icon-angle-down"></span></span>');
+        })
+
+
+        $('#beginTime').date();
+        $('#endTime').date({
+            theme: "datetime"
+        });
+        // if($('#timeEat').val()==''){
+        //   $('#pay').attr('disabled','disabled');
+        // }
+        console.log($('#beginTime').val());
+
+        $('td').each(function () {
+            if ($(this).html() > curTime) {
+                $(this).addClass('can');
+            } else {
+                $(this).attr({
+                    disabled: 'disabled'
+                });
+                $(this).css({ color: '#b9b9b9', textDecoration: 'line-through' });
+            }
+        })
+        $('#dateconfirm').live('click', function () {
+            $('td').removeClass('can am-danger');
+            if (html != $('#beginTime').val()) { 
+                if ($('#beginTime').val() >= html) {
+
+                    $("td").css({ color: '', textDecoration: 'none' })
+                    $('td').removeAttr('disabled');
+                    $('td').addClass('can');
+                }
+                else {
+                    $('td').attr({
+                        disabled: 'disabled'
+                    });
+                    $('td').css({ 'color': '#b9b9b9', 'text-decoration': 'line-through' })
+                }
+            } else {
+                $('td').each(function () {
+
+                    if ($(this).html() > curTime) {
+                        $(this).addClass('can');
+                        $(this).css({ color: '', textDecoration: 'none' })
+                        $(this).removeAttr('disabled');
+                    } else {
+                        $(this).attr({
+                            disabled: 'disabled'
+                        });
+                        $(this).css({ 'color': '#b9b9b9', 'text-decoration': 'line-through' })
+                    }
+                })
+            }
+        });
+
+
+        $('td').click(function () {
+            if ($(this).hasClass('can')) {
+                $('#pay').removeAttr('disabled');
+                $('td').removeClass('am-danger');
+                $(this).addClass('am-danger');
+                $('#timeEat').val($(this).html());
+            } else {
+                return;
+            }
+        });
+        $('#pay').on('click', function () {
+          //  if ($("#pricetotal").html() > 0) {
+                if (!$('.addressServ').has('li').length) {
+                    //  alert('请选择服务地址');
+                    sure('请选择服务地址');
+                    return false;
+                }
+                if ($('#timeEat').val() == '') {
+                    //alert('请选择用餐日期');
+                    sure('请选择用餐日期');
+                    return false;
+                }
+                else {
+                    var food = "";
+                    var cele = "";
+                    var waiter = "";
+                    var dinner = "";
+                    var coupon = "";
+                    if ($.cookie("Food") != null) {
+                        food = $.cookie("Food")
+                    }
+                    if ($.cookie("Waiter") != null) {
+                        waiter = $.cookie("Waiter")
+                    }
+                    if ($.cookie("Cele") != null) {
+                        cele = $.cookie("Cele")
+                    }
+                    if ($.cookie("Dinner") != null) {
+                        dinner = $.cookie("Dinner")
+                    }
+                    if ($.cookie("Coupon") != null) {
+                        coupon = $.cookie("Coupon")
+                    }
+                    var date = $("#beginTime").val();
+                    var time = $("#timeEat").val();
+                    var postData =
+                    {
+                        foods: food,
+                        dinner: dinner,
+                        cele: cele,
+                        waiter: waiter,
+                        integral: $.cookie("jifenmoney"),
+                        address: $.cookie("address"),
+                        coupon: coupon,
+                        time: date + " " + time + ":00",
+                        phone: phone
+                    }
+                    var orderid = "";
+                    var money = 0;
+
+                    getAjax("/CommonModule/Q_POOrder/payorder", postData, function (data) {
+                        var obj = eval('(' + data + ')');
+                        var jslength = 0;
+                        for (var js2 in obj) {
+                            jslength++;
+                        }
+                        if (jslength > 0) {
+                            window.location.href = 'pay';
+                        }
+                        else {
+                            alert("系统繁忙，请重试")
+                        }
+
+                    })
+
+                }
+            //}
+            //else {
+            //    alert("您并未选择任何东西，无法支付");
+            //}
+        })
+    })
+    function sure(obj) {
+        $('.tk').fadeIn('fast');
+        $('.tk').find(".content").html(obj);
+        $('.closem').click(function () {
+            $('.tk').fadeOut('fast');
+        });
+        $('#sub').click(function () {
+            $('.tk').fadeOut('fast');
+        });
+    }
+
+    function jfclick() {
+        if ($('#jifen').prop('checked')) {
+            jifenmoney = $('#jifenmoney').html();
+            payable = (amount - discount - jifenmoney).toFixed(2);
+            $.cookie("jifenmoney", jifenmoney);
+            //if (payable < 0) {
+            //    payable = 0;
+            //    $('#jifenmoney').text(moneyalls.toFixed(2));
+            //}
+            $('#pricetotal').text(payable);
+            $('#yfje').val(payable);
+
+        } else {
+            payable = (amount - discount).toFixed(2);
+            $.cookie("jifenmoney", 0);
+            $('#pricetotal').text(payable);
+            $('#yfje').val(payable);
+        }
+    }
+
+</script>

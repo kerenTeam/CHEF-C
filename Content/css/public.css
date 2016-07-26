@@ -1,0 +1,75 @@
+﻿@charset "UTF-8";
+
+*{margin:0;padding:0}
+a{text-decoration:none;color: #000;}
+li,ul{list-style:none; padding: 0px; margin: 0px;}
+img{border:none;vertical-align: middle;}
+h1,h2,h3,h4,h5,h6,b{font-weight: 500;margin: 0;}
+input,textarea{outline: none;font-family: "Microsoft Yahei light","Hiragino Sans GB",Helvetica,"Helvetica Neue","微软雅黑",Tahoma,Arial,sans-serif;}
+body{font-family: "Microsoft Yahei","Hiragino Sans GB",Helvetica,"Helvetica Neue","微软雅黑",Tahoma,Arial,sans-serif;  font-size: 1.6rem; background-color: #fff; line-height: 1;}
+label{
+	font-weight: normal;
+	margin: 0;
+}
+
+@media(max-width: 350px){
+	html{
+		font-size: 8px;
+	}
+}
+@media(min-width: 350px) and (max-width: 450px){
+	html{
+		font-size: 10px;
+	}
+}
+@media(min-width: 450px) and (max-width: 600px){
+	html{
+		font-size: 12px;
+	}
+}
+@media(min-width: 600px){
+	html{
+		font-size: 16px;
+	}
+}
+p{
+	margin: 0;
+}
+.paddfoot{
+   padding-bottom: 7rem;
+}
+/* 红色按钮 */
+.redbtn{
+	color: #fff !important;
+	background-color: #d72d22;
+	border-radius: .5rem;
+}
+/* 自定义复选框 */
+.my_checke input{
+	width: 0;
+	height: 0;
+	display: none;
+}
+.my_checke i{
+	color: transparent;
+
+}
+/* 绝对定位body */
+.po_ab{
+	position: absolute;
+   height: 100%;
+   width: 100%;
+}
+/* 头部 */
+/*.am-header .am-header-right{
+	padding: 1.3% 0!important;
+}*/
+
+.set_form{
+	padding-bottom: 22%;
+}
+@media(max-width: 360px){
+	.copyright{
+		margin-top: 30% !important;
+	}
+}

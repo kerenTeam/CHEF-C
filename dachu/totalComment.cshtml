@@ -1,0 +1,398 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/globe.css">
+    <link href="~/Content/css/webuploader.css" rel="stylesheet" />
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/webuploader.nolog.js"></script>
+    <script>
+        var orderid = GetQuery("orderid");
+        var score = 0;
+        var phone = "";
+        var guid = "";
+        var evaluateid = "";
+
+        $(function () {
+            $("#orderid").val(orderid);
+            getPhone()
+            getOrder()//获取订单数据
+            getSessionId()
+        })
+        function getPhone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                }
+
+            })
+        }
+        function getSessionId() {
+            var guid = (G() + G() + "-" + G() + "-" + G() + "-" +
+    G() + "-" + G() + G() + G()).toUpperCase()
+            getAjax("/CommonModule/Q_Evaluate/getSessionId", { evaluateid: guid }, function (data) {
+                evaluateid = data;
+            })
+        }
+
+        function getOrder() {
+            var waiter = 0;
+            var waiternumbers = 0;
+            AjaxJson("/CommonModule/Q_POOrder/getStateInfo", { orderid: orderid }, function (data) {
+                $.each(data, function (i) {
+                    if (parseFloat(data[i].manwaiter) + parseFloat(data[i].wumenwaiter) > 0) {
+                        waiter = parseFloat(data[i].manwaiter) + parseFloat(data[i].wumenwaiter);
+                        getAjax("/CommonModule/Q_SingleFoodEvaluate/getWaiterEvaluates", { orderid: data[i].poorderid }, function (waiternumber) {
+                            waiternumbers = waiternumber;
+                        })
+                    }
+                })
+            })
+            var orderlist = "<p class='am-padding-vertical-sm orderTit'><img src='/Content/img/marks.png' class='marks' ><span>菜品评分</span></p>";
+            AjaxJson("/CommonModule/Q_POOrder/getOrderEntryByOrderId", { orderid: orderid }, function (entry) {
+                $.each(entry, function (j) {
+                    if (entry[j].state == 1) {
+                        orderlist += "<li><div class='share_left'><img src='" + entry[j].thumbnail + "' alt='" + entry[j].foodname + "'></div><div class='share_right'><p>" + entry[j].foodname + "</p> <a>已评价</a> </div></li>"
+                    }
+                    else {
+                        orderlist += "<li><div class='share_left'><img src='" + entry[j].thumbnail + "' alt='" + entry[j].foodname + "'></div><div class='share_right'><p>" + entry[j].foodname + "</p> <a onclick='hrefsingleComment(\"" + entry[j].foodid + "\")'>晒单评价</a> </div></li>"
+                    }
+                })
+                if (waiter != 0) {
+                    if (waiternumbers == 1) {
+                        orderlist = orderlist + " <li><div class='share_left'>服务员</div> <div class='share_right2'> <a href='javascript:;'>已评价</a></div></li> ";
+                    }
+                    else {
+                        orderlist = orderlist + " <li><div class='share_left'>服务员</div> <div class='share_right2'> <a onclick='hrefsingleComment(\"1\")'>晒单评论</a></div></li> ";
+                    }
+                }
+                $("#orderlist").html(orderlist)
+
+            })
+        }
+        function G() {
+            return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
+        }
+
+
+
+        function Evaluate() {
+            var doc = $("#doc").val();
+            if (score == 0) {
+                alert("请完善评论内容")
+                return false;
+            }
+
+            else if ($('input:radio:checked').val() == undefined) {
+                alert("请完善评论内容")
+                return false;
+            }
+            else {
+                getAjax("/CommonModule/Q_Evaluate/AddEvaluate", { phone: phone, orderid: orderid, score: score, consum: 0, comment: doc, CommentState: $('input:radio:checked').val() }, function (data) {
+                    if (data > 0) {
+                        alert("评论成功")
+                        window.location.href = "orderManage"
+                    }
+                    else if (data == 0) {
+                        alert("评论失败")
+                    }
+                    else {
+                        alert(data);
+                    }
+                })
+            }
+        }
+
+        function hrefsingleComment(id) {
+            window.location.href = "singleComment?id=" + id + "&orderid=" + orderid;
+        }
+
+
+        function number(numbers) {
+            score = numbers;
+        }
+    </script>
+
+
+
+
+</head>
+<body>
+
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1);">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            评价
+        </h1>
+    </header>
+    <input type="hidden" id="orderid" />
+    <div>
+        <ul class="share_order bwhite" id="orderlist"></ul>
+    </div>
+    <form id="commentform" class="bwhite am-margin-top-xs" method="post">
+        <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>订单评分</span></p>
+        <!-- 保存打分内容 -->
+        <input id="taste" name="taste" value="0" hidden type="txt">
+        <input id="environment" name="environment" hidden value="0" type="txt">
+        <input id="quality" name="quality" hidden value="0" type="txt">
+        <div id="AddDP" class="am-shadow">
+
+            <ul class="clist_ul">
+                <li class="am-cf">
+                    <div class="am-u-sm-4">
+                        <label class="am-radio am-danger haoping">
+                            <input type="radio" name="radiocomt" value="1" data-am-ucheck> 好评
+                        </label>
+                    </div>
+                    <div class="am-u-sm-4">
+                        <label class="am-radio am-danger haoping">
+                            <input type="radio" name="radiocomt" value="2" data-am-ucheck> 中评
+                        </label>
+                    </div>
+                    <div class="am-u-sm-4">
+                        <label class="am-radio am-danger haoping">
+                            <input type="radio" name="radiocomt" value="3" data-am-ucheck> 差评
+                        </label>
+                    </div>
+                </li>
+                <li class="am-padding-horizontal">
+                    厨师评分<span class="Select">
+                        <a onclick="number(1)" onmouseover="    javascript: setProfix('taste_'); showStars(1, 'taste');"
+                           onmouseout="javascript:setProfix('taste_');clearStars('taste');"
+                           href="javascript:setProfix('taste_');setStars(1,'taste');">
+                            <img id="taste_1" title="差(1)" src="/Content/img/icon_star_1.gif">
+                        </a>
+
+                        <a onclick="number(2)" onmouseover="javascript:setProfix('taste_');showStars(2,'taste');"
+                           onmouseout="javascript:setProfix('taste_');clearStars('taste');"
+                           href="javascript:setProfix('taste_');setStars(2,'taste');">
+                            <img id="taste_2" title="一般(2)" src="/Content/img/icon_star_1.gif">
+                        </a>
+
+                        <a onclick="number(3)" onmouseover="javascript:setProfix('taste_');showStars(3,'taste');"
+                           onmouseout="javascript:setProfix('taste_');clearStars('taste');"
+                           href="javascript:setProfix('taste_');setStars(3,'taste');">
+                            <img id="taste_3" title="好(3)" src="/Content/img/icon_star_1.gif">
+                        </a>
+
+                        <a onclick="number(4)" onmouseover="javascript:setProfix('taste_');showStars(4,'taste');"
+                           onmouseout="javascript:setProfix('taste_');clearStars('taste');"
+                           href="javascript:setProfix('taste_');setStars(4,'taste');">
+                            <img id="taste_4" title="很好(4)" src="/Content/img/icon_star_1.gif">
+                        </a>
+
+                        <a onclick="number(5)" onmouseover="javascript:setProfix('taste_');showStars(5,'taste');"
+                           onmouseout="javascript:setProfix('taste_');clearStars('taste');"
+                           href="javascript:setProfix('taste_');setStars(5,'taste');">
+                            <img id="taste_5" title="非常好(5)" src="/Content/img/icon_star_1.gif">
+                        </a>
+                    </span>
+                </li>
+
+
+
+
+            </ul>
+        </div>
+
+        <div class="comment_pic am-cf">
+            <textarea name='content' id='doc' rows="4" class="comment_pic_t" placeholder="亲，输入你的评价吧！"></textarea>
+            <div id="fileList"></div> <!--这是存放图片的容器-->
+            <div class="cp_img_jia" id="filePicker"></div> <!--这是上传按钮-->
+            @*<img src="/Content/img/add_img.png" class="upload_image" alt="图片上传" />*@
+            <input type="button" onclick="Evaluate()" class="publish" value="发表评论">
+        </div>
+    </form>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal" class="active">
+                    <span class=""><img src="/Content/img/gr2.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</body>
+<script src="/Content/js/amazeui.min.js"></script>
+<!-- 引用初始化JS -->
+<script>
+
+    var applicationPath = window.applicationPath === "" ? "" : window.applicationPath || "../../";
+    $(function () {
+        var $ = jQuery,
+        $list = $('#fileList'),
+        // 优化retina, 在retina下这个值是2
+        ratio = window.devicePixelRatio || 1,
+        // 缩略图大小
+        thumbnailWidth = 90 * ratio,
+        thumbnailHeight = 90 * ratio,
+        // Web Uploader实例
+        uploader;
+        uploader = WebUploader.create({
+            // 选完文件后，是否自动上传。
+            auto: true,
+
+            // swf文件路径
+            swf: applicationPath + '/Content/js/Uploader.swf',
+
+            // 文件接收服务端。
+            server: applicationPath + '/CommonModule/Q_Evaluate/UpLoadProcess',
+
+            // 选择文件的按钮。可选。
+            // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+            pick: '#filePicker',
+
+            //只允许选择图片
+            accept: {
+                title: 'Images',
+                extensions: 'gif,jpg,jpeg,bmp,png',
+                mimeTypes: 'image/*'
+            }
+        });
+
+        // 当有文件添加进来的时候
+        uploader.on('fileQueued', function (file) {
+            var $li = $(
+                    '<div id="' + file.id + '" class="cp_img">' +
+                        '<img>' +
+                    '<div class="cp_img_jian"></div></div>'
+                    ),
+                $img = $li.find('img');
+
+
+            // $list为容器jQuery实例
+            $list.append($li);
+
+            // 创建缩略图
+            // 如果为非图片文件，可以不用调用此方法。
+            // thumbnailWidth x thumbnailHeight 为 100 x 100
+            uploader.makeThumb(file, function (error, src) {
+                if (error) {
+                    $img.replaceWith('<span>不能预览</span>');
+                    return;
+                }
+
+                $img.attr('src', src);
+            }, thumbnailWidth, thumbnailHeight);
+        });
+
+        // 文件上传过程中创建进度条实时显示。
+        uploader.on('uploadProgress', function (file, percentage) {
+            var $li = $('#' + file.id),
+                $percent = $li.find('.progress span');
+
+            // 避免重复创建
+            if (!$percent.length) {
+                $percent = $('<p class="progress"><span></span></p>')
+                        .appendTo($li)
+                        .find('span');
+            }
+
+            $percent.css('width', percentage * 100 + '%');
+        });
+
+        // 文件上传成功，给item添加成功class, 用样式标记上传成功。
+        uploader.on('uploadSuccess', function (file, response) {
+
+            $('#' + file.id).addClass('upload-state-done');
+        });
+
+        // 文件上传失败，显示上传出错。
+        uploader.on('uploadError', function (file) {
+            var $li = $('#' + file.id),
+                $error = $li.find('div.error');
+
+            // 避免重复创建
+            if (!$error.length) {
+                $error = $('<div class="error"></div>').appendTo($li);
+            }
+
+            $error.text('上传失败');
+        });
+
+        // 完成上传完了，成功或者失败，先删除进度条。
+        uploader.on('uploadComplete', function (file) {
+            $('#' + file.id).find('.progress').remove();
+        });
+
+        //所有文件上传完毕
+        uploader.on("uploadFinished", function () {
+            //提交表单
+
+        });
+
+        //开始上传
+        $("#ctlBtn").click(function () {
+            uploader.upload();
+
+        });
+
+        //显示删除按钮
+        $(".cp_img").on("mouseover", function () {
+            $(this).children(".cp_img_jian").css('display', 'block');
+
+        });
+        //隐藏删除按钮
+        $(".cp_img").on("mouseout", function () {
+            $(this).children(".cp_img_jian").css('display', 'none');
+
+        });
+        //执行删除方法
+        $list.on("click", ".cp_img_jian", function () {
+            var Id = $(this).parent().attr("id");
+            uploader.removeFile(uploader.getFile(Id, true));
+            $(this).parent().remove();
+        });
+
+    });
+</script>
+
+<script type="text/javascript" src="/Content/js/star.js"></script>
+
+</body>
+</html>

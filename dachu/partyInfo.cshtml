@@ -1,0 +1,396 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="~/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="~/Content/css/app.css">
+    <script src="~/Content/Scripts/jquery/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        var id = GetQuery("id");
+        var foodid = id;
+        var phone="";
+        $(function () {
+            getphone();//获取电话
+            getFoodDetails();//获取宴会详情
+            getFoodAll();//获取宴会所有的菜
+            Evaluate();//加载评论
+            Number(); //加载缓存数量
+        })
+        //获取电话
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                    $("#phone").val(phone)
+                }
+            })
+        }
+        //获取宴会详情
+        function getFoodDetails() {
+            var foodstars = "";
+            var caipinstar = "";
+            var chushistar = "";
+            var fuwustar = "";
+            AjaxJson("/CommonModule/Q_Food/getInfoByFoodId", { foodid: id }, function (data) {
+                $.each(data, function (i) {
+                    var imgs = "";
+                    AjaxJson("/CommonModule/Q_Img/getImgByFoodId", { foodid: id }, function (img) {
+                        $.each(img, function (q) {
+                            imgs += "<li><img src='" + img[q].imgaddress + "' class='am-img-responsive card'><div class='am-slider-desc bannerBg'>山地土豆炖甲鱼</div></li>";
+                        })
+                        $("#img").html(imgs)
+                        $("#foodname").html(data[i].foodname)
+                        var tuijian = "";
+                        for (var k = 0; k < data[i].recommend; k++) {
+                            tuijian += "<img src='/Content/img/introHeart.png' class='am-vertical-align-middle heart2' alt=''>";
+                        }
+                        $("#tuijian").html(tuijian)
+                        $("#number").html(data[i].cumulativenumber)
+                        $("#money").html(data[i].foodprice)
+                        $("#tedian").html(data[i].foodtrait)
+                        $("#scoure").html(data[i].foodstar)
+                        $("#caipin").html(data[i].foodstar);
+                        $("#chushi").html(data[i].cookstar);
+                        $("#fuwu").html(data[i].waiterstar);
+                        $("#evaluateNumber").html(data[i].evaluatenumber)
+                        $("#pinlun").html(data[i].evaluatenumber)
+                        for (var j = 0; j < data[i].recommend; j++) {
+                            foodstars += "<i class='am-icon-heart'></i>";
+                        }
+                        $("#foodstar").html(foodstars)
+                        for (var j = 0; j < data[i].foodstar; j++) {
+                            caipinstar += "<i class='am-icon-heart'></i>";
+                        }
+                        $("#caipinstar").html(caipinstar);
+                        for (var j = 0; j < data[i].cookstar; j++) {
+                            chushistar += "<i class='am-icon-heart'></i>";
+                        }
+                        $("#chushistar").html(chushistar);
+                        for (var j = 0; j < data[i].waiterstar; j++) {
+                            fuwustar += "<i class='am-icon-heart'></i>";
+                        }
+                        $("#fuwustar").html(fuwustar);
+                    })
+                })
+            })
+        }
+
+        //获取宴会所有的菜
+        function getFoodAll() {
+
+            var categorys = "";
+            var categoryall = "";
+            var fooddata;
+            AjaxJson("/CommonModule/Q_Banquet/getBanquetNameByFoodId", { foodid: id }, function (data) {
+                fooddata = data;
+            })
+            AjaxJson("/CommonModule/Q_FoodCategory/getCategoryAll", {}, function (category) {
+                $.each(category, function (j) {
+                    var str = "";
+                    categorys = "";
+                    $.each(fooddata, function (i) {
+                        if (category[j].code == fooddata[i].categorycode) {
+                            categorys = "<div class='am-cf menu'><div class='am-u-sm-3 am-text-sm' style='padding-left:0;'><b>" + category[j].name + "：</b></div><div class='am-u-sm-9 menuH am-fr'>";
+                            str += "<span>" + fooddata[i].foodname + "</span>";
+                        }
+                    })
+                    categoryall += categorys + str + "</div></div>";
+                })
+                $("#banquet").html(categoryall);
+            })
+        }
+
+        //加载缓存数量
+        function Number() {
+            var number = 0;
+            if ($.cookie("Food") != null) {
+                var food = $.cookie("Food");
+                var foods;
+                foods = eval('(' + food + ')')
+                $.each(foods, function (k) {
+                    if (id == foods[k].FoodId) {
+                        number = foods[k].Number;
+                    }
+                })
+            }
+            $("#numbers").val(number)
+        }
+
+        //加载评论
+        function Evaluate() {
+            var str = "";
+            var img = "";
+            AjaxJson("/CommonModule/Q_SingleFoodEvaluate/getEvaluateByFoodId", { foodid: id }, function (data) {
+                $.each(data, function (i) {
+                    var foodscore = "";
+                    if (data[i].username == null) {
+                        data[i].username = data[i].userphone;
+                    }
+                    if (data[i].userimage == null) {
+                        data[i].userimage = "/Content/img/userimg_03.gif";
+                    }
+                    for (var j = 0; j < data[i].foodscore; j++) {
+                        foodscore += "<i class='am-icon-heart'></i>";
+                    }
+                    str += "<div class='commentList am-cf'><div class='am-u-sm-2 am-center'><img src='" + data[i].userimage + "' class='am-circle comtimg' alt=''></div><div class='am-u-sm-10'><div class='am-comment-meta'><a href='javascript:;' class='am-comment-author'>" + data[i].username + "<span class='am-badge am-badge-danger am-margin-left-xs am-radius'>VIP</span></a><time datetime='2013-07-27T04:54:29-07:00' class='am-fr'>" + data[i].createtime.substring(0, 10) + "</time></div><div class='am-padding-vertical-xs am-padding-horizontal am-text-xs'><div class='cent'>打分：" + foodscore + "</div><div style='word-break: break-all;'>" + data[i].comment + "</div></div><ul data-am-widget='gallery' class='am-gallery am-avg-sm-4 am-gallery-default' data-am-gallery='{ pureview: true }'>";
+                    AjaxJson("/CommonModule/Q_SingleFoodImg/getSingleImg", { singlefoodid: data[i].id }, function (ImgJson) {
+                        img = "";
+                        $.each(ImgJson, function (j) {
+                            img += "<li><div class='am-gallery-item'><a href=\"<?=IP.$val['address']?>\" class=''><img src='" + ImgJson[j].address + "' /></a></div></li>";
+                        })
+                        str = str + img + "</ul></div></div>";
+                    })
+                    $("#evaluate").html(str)
+                })
+            })
+        }
+    </script>
+</head>
+
+<body class="bpa">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            宴会详情
+        </h1>
+    </header>
+    <!-- 详情 -->
+    <form action="" method="post" enctype="mutiltype/data">
+        <div class="foodinfo am-shadow am-padding-bottom-sm">
+            <!-- banner -->
+            <div data-am-widget="slider" id="partyInfo" class="am-slider am-slider-default fimg" data-am-slider='{}'>
+                <ul class="am-slides" id="img"></ul>
+            </div>
+            <div class="am-cf relative height">
+                <img src="~/Content/img/marks.png" class="pal marks" alt="">
+                <div class="am-u-sm-7 palC">
+                    <p class="am-text-default" id="foodname"></p>
+                    <div class="monthsam-margin-right">
+                        <span class="am-vertical-align-middle am-margin-right-xs am-text-sm red">推荐指数</span>
+                        <span id="tuijian">
+
+                        </span>
+                        <br>
+                        <div class="red am-vertical-align-middle am-text-sm" style="width: 8rem;">总销<span id="number" class="mlpi"></span>份</div>
+                    </div>
+                </div>
+                <div class="am-u-sm-5 palR am-text-center">
+                    <div class="pr red partyRight"><i class="am-icon-cny am-text-xl "></i><span class="price am-text-xl " id="money"></span>/桌</div>
+                    <div class="foodNum am-vertical-align-middle piNum">
+                        <span class="reduce am-icon-minus-square" onclick="handle(this, false, foodid)"></span>
+                        <input type="text" id="numbers" class="numTxt partyNum" name="numbers[]" onkeydown="keydown(this)" onkeypress="return IsNum(event)" oninput="foodueserWrite(this, foodid)" value="0">
+                        <span class="add am-icon-plus-square" onclick="handle(this, true, foodid)"></span>
+                        <!--  onClick="handle(this, true)" -->
+                    </div>
+                </div>
+            </div>
+            <div class="am-margin-sm borderTop foodIntro">
+                <p class="am-text-sm"><strong>简介：</strong><span id="tedian"></span></p>
+            </div>
+        </div>
+        <!-- 菜单 -->
+        <div class="am-shadow am-margin-top-xs">
+            <div class="blockHead am-padding-top-sm">
+                <img src="~/Content/img/marks.png" class="marks am-marign--right sm am-vertical-align-middle"> 宴会菜单
+            </div>
+            <div id="banquet">
+
+            </div>
+        </div>
+        <!-- 客服 -->
+        <div class="bwhite am-margin-top-xs">
+            <div class="blockHead am-padding-top-sm">
+                <img src="~/Content/img/marks.png" class="marks am-marign--right sm am-vertical-align-middle"> 贴心服务
+            </div>
+            <div class="ctmMessage ctmMessage2">
+                <p>
+                    亲，下午好！
+                    <br>很高兴为您服务，按键召唤，3分钟内我会拨打您的手机：
+                </p>
+                <input type="tel" id="phone" value="15708767896">
+                <button type="button" class="am-btn bred white am-btn-block am-radius am-margin-top-lg am-padding-sm zh">召唤我的客户经理</button>
+                <br>
+            </div>
+        </div>
+        <!-- model -->
+        <div class="am-modal am-modal-no-btn" tabindex="-1" id="my-alert">
+            <div class="am-modal-dialog am-radius">
+                <div class="am-modal-hd am-text-danger">
+                    提 示
+                    <a href="javascript: void(0)" class="am-close am-close-spin" data-am-modal-close>&times;</a>
+                </div>
+                <div class="am-modal-bd customBtn">
+                    <p class="customModalP">
+                        客服正在处理。
+                        <br>请留意我们给您的去电(400-820-1790)
+                    </p>
+                    <a href="javascript:;" class="btn am-btn am-btn-sm am-btn-danger am-radius" data-am-modal-close>好</a>
+                </div>
+            </div>
+        </div>
+        <!-- 评价 -->
+        <div class="bwhite am-margin-top-xs">
+            <div class="blockHead am-padding-top-sm">
+                <img src="~/Content/img/marks.png" class="marks am-marign--right sm am-vertical-align-middle"> 消费评价
+            </div>
+            <div class="am-g topBorder">
+                <div class="am-u-sm-5 am-cf am-margin-top-sm am-text-center am-vertical-align">
+                    <div class="red am-fl am-margin-right-xs am-vertical-align-middle"><span class="am-text-xl" id="scoure"></span>分</div>
+                    <div class="am-fl am-text-xs red am-vertical-align-middle">
+                        <b id="foodstar"></b>
+                        <br>
+                        <span class="am-text-xs black"> 共<b id="evaluateNumber"></b>人评价</span>
+                    </div>
+                </div>
+                <div class="am-u-sm-7 stars">
+                    <p class="am-text-xs red">
+                        <span class="am-text-right">菜品:</span> <b id="caipin"></b> <b id="caipinstar"></b>
+                    </p>
+                    <p class="am-text-xs red">
+                        <span class="am-text-right">厨师:</span> <b id="chushi"></b> <b id="chushistar"></b>
+                    </p>
+                    <p class="am-text-xs red">
+                        <span class="am-text-right">服务:</span> <b id="fuwu"></b> <b id="fuwustar"></b>
+                    </p>
+                </div>
+            </div>
+            <p class="pbgc">网友点评 <span class="am-fr">(<b id="pinlun"></b>)</span></p>
+            <!-- 文字评论 -->
+            <div id="evaluate">
+
+            </div>
+        </div>
+        <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft" style="bottom:51px;" id="">
+            <div class="am-u-sm-9 a">
+                <span class="green am-posR"><img src="~/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA">0</span></span>
+                <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0</span>
+                <span class="ff am-text-sm gray" style="display: inline-block;">
+                    | 包含<span class="am-icon-cny" id="servmoney"></span>服务费
+                    <input type="hidden" id="fee" name="servmoneydata" value="0">
+                </span>
+            </div>
+            <div class="am-u-sm-3 b">
+                <a href="cart">
+                    <button type='button' class="am-btn">去结算</button>
+                </a>
+            </div>
+        </div>
+    </form>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="~/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="~/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="~/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="~/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">请输入正确电话号码</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                @*<button type='button' class="bno beee whtie closem">取消</button>*@
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+    <script src="~/Content/js/amazeui.min.js"></script>
+    <script src="~/Content/js/num_cailan.js"></script>
+</body>
+<script>
+    $(function () {
+        $('.zh').on('click', function () { 
+            var phone = $("#phone").val();
+            if (phone == '' || !(/^1((3|4|5|8|7){1}\d{1}|70)\d{8}$/.test(phone))) {
+                // alert("请输入正确的手机号");
+                sure();
+               
+            }
+            else {
+                //$("#phone1").html($("#phone").val())
+                getAjax("/CommonModule/Q_CustomerManager/AddInfo", { phone: $("#phone").val() }, function (data) {
+                    if (data == 1) {
+                        $('#my-alert').modal('open');
+                    }
+                    else {
+                        alert("召唤失败")
+                    }
+                })
+            }
+            //$.ajax({
+            //    type: "POST",
+            //    url: '',
+            //    data: 'phone=' + phone,
+            //    success: function (data) {
+            //        console.log(data);
+            //        if (data == 1) {
+            //            $('#doc-modal-1').modal('open');
+            //            return false;
+            //        }
+            //    }
+            //})
+        })
+
+        function sure() {
+            $('.tk').fadeIn('fast');
+        }
+        $('.closem').click(function () {
+            $('#phone').focus();
+            $('.tk').fadeOut('fast');
+            return false;
+        });
+    })
+</script>
+</html>

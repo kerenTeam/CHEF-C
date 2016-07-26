@@ -1,0 +1,159 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link href="~/Content/css/amazeui.min.css" rel="stylesheet" />
+    <link href="~/Content/css/app.css" rel="stylesheet" />
+    <link href="~/Content/css/default_skin.css" rel="stylesheet" />
+    <link href="~/Content/css/skeleton.css" rel="stylesheet" />
+    <link href="~/Content/css/imagebox.css" rel="stylesheet" />
+    <link href="~/Content/css/layout.css" rel="stylesheet" />
+    <script src="~/Content/Scripts/jquery/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        $(function () {
+            getyanxi()
+        })
+
+        function getyanxi() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Food/getFoodByCategoryId", { CategoryId: 'fe7ad9a9-1bec-4929-b160-85f9a784f527' }, function (data) {
+                $.each(data, function (i) {
+                    str += "<li>  <a onclick='hrefpartyIfo(\""+data[i].foodid+"\")'><img src='" + data[i].packagelogo + "' /> </a><div class='sc-content'><h2> <a href='partyInfo'><img class='artBtmImg partyWu' src='/Content/img/wuya_04.png'><div class='artistBtm'><p class='artistP'>特点：" + data[i].foodtrait + "</p><p class='artistP am-g'><i class='am-icon-heart'></i> <i class='am-icon-heart'></i> <i class='am-icon-heart'></i> <span class='am-fr yuex'>总销" + data[i].cumulativenumber + "份</span></p></div></a></h2></div></li>";
+                })
+                $("#food").html(str);
+            })
+        }
+        function  hrefpartyIfo(id) {
+            window.location.href = "partyInfo?id="+id;
+        }
+    </script>
+</head>
+
+<body class="bwhite quanp">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform bheader" style="position:fixed!important;top:0px !important; width: 100%;height: 49px;z-index: 9999">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+        宴会
+        </h1>
+    </header>
+
+  <!-- 960 Container -->
+    <div class="container columns">
+      <img class="artToImg" src="/Content/img/wuya_02.png">
+        <!-- Slider -->
+        <div class="sixteen">
+            <div class="project">
+                <div class="sky-carousel">
+                    <div class="sky-carousel-wrapper">
+                        <ul class="sky-carousel-container partyfood" id="food">
+                    
+                </ul>
+            </div>
+        </div>
+    </div> 
+
+
+
+
+
+    <script src="~/Content/js/jquery.min.js"></script>
+    <script src="~/Content/js/amazeui.min.js"></script>
+    <script src="~/Content/js/custom.js"></script>
+    <script src="~/Content/js/ender.min.js"></script>
+    <script src="~/Content/js/selectnav.js"></script>
+    <script src="~/Content/js/twitter.js"></script>
+    <script src="~/Content/js/effects.js"></script>
+    <script type="text/javascript" src="~/Content/js/jquery.sky.carousel-1.0.min.js">
+
+    </script>
+<script type="text/javascript">
+
+
+
+  $(function() {
+     var width = $(window).width(); 
+          var height = $(window).height();
+         $(".sky-carousel").attr("height",height+'px');
+         if(width>320 && width<=375){
+           $('.sky-carousel').carousel({
+            itemWidth: 350,
+            itemHeight: 351,
+            distance: -10,
+            selectedItemDistance: 50,
+            selectedItemZoomFactor: 0.8,
+            unselectedItemZoomFactor: 0.6,
+            unselectedItemAlpha: 0.8,
+            motionStartDistance: 160,
+            topMargin: 10,
+            gradientStartPoint: 0.1, 
+            gradientOverlaySize: 190,
+            selectByClick: false
+          });
+         }
+          if(width>375 && width<=414){
+           $('.sky-carousel').carousel({
+            itemWidth: 400,
+            itemHeight: 351,
+            distance: -10,
+            selectedItemDistance: 50,
+            selectedItemZoomFactor: 0.8,
+            unselectedItemZoomFactor: 0.6,
+            unselectedItemAlpha: 0.8,
+            motionStartDistance: 160,
+            topMargin: 10,
+            gradientStartPoint: 0.1, 
+            gradientOverlaySize: 190,
+            selectByClick: false
+          });
+         }
+         if(width>414){
+           $('.sky-carousel').carousel({
+            itemWidth: 600,
+            itemHeight: 351,
+            distance: -10,
+            selectedItemDistance: 100,
+            selectedItemZoomFactor: 0.8,
+            unselectedItemZoomFactor: 0.6,
+            unselectedItemAlpha: 0.8,
+            motionStartDistance: 160,
+            topMargin: 10,
+            gradientStartPoint: 0.1, 
+            gradientOverlaySize: 190,
+            selectByClick: false
+          });
+         }
+    $('.sky-carousel').carousel({
+      itemWidth: 280,
+      itemHeight: 351,
+      distance: -10,
+      selectedItemDistance: 50,
+      selectedItemZoomFactor: 0.8,
+      unselectedItemZoomFactor: 0.6,
+      unselectedItemAlpha: 0.8,
+      motionStartDistance: 160,
+      topMargin: 10,
+      gradientStartPoint: 0.1, 
+      gradientOverlaySize: 190,
+      selectByClick: false
+    });
+  });
+</script>
+
+</body>
+
+</html>

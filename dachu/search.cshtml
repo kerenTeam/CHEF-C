@@ -1,0 +1,129 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <script src="~/Content/Scripts/jquery/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        $(function () {
+
+        })
+
+        function search() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Food/GetFoodName", { keyWords: $("#search").val() }, function (data) {
+                $.each(data, function (i) {
+                    var tuijian = "";
+                    for (var j = 0; j < data[i].recommend; j++) {
+                        tuijian += "<img src='/Content/img/htw.png' class='htw' alt=''>";
+                    }
+                    str += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left '><a onclick='hrefFoodInfo(\"" + data[i].foodid + "\")'><img src='" + data[i].thumbnail + "' alt=''><div class='am-cf topBrief'><div class='am-fl am-text-sm white am-vertical-align'><span class='am-vertical-align-middle vgname'>" + data[i].foodname + "</span></div><div class='am-fr am-vertical-align-middle'><span class='intoIndex'><span class='am-text-xs white'>推荐指数</span>" + tuijian + "</span><span class='am-text-xs white'>总销 <span>" + data[i].cumulativenumber + "份</span></span></div></div></a><div class='numChange am-vertical-align'><div class='pr red am-vertical-align-middle'><span class='price am-icon-cny priceNew'>" + data[i].foodprice + "</span> /份</div><div class='foodNum am-vertical-align-middle'><span></span><span></span><span class='reduce am-icon-minus-square' onClick='handle(this, false,\"" + data[i].foodid + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='foodueserWrite(this,\"" + data[i].foodid + "\")' value='0'><span class='add am-icon-plus-square' onClick='handle(this, true,\"" + data[i].foodid + "\")'></span></div></div></li>";
+                })
+                $("#food").html(str);
+            })
+        }
+        //跳转菜品详情面
+        function hrefFoodInfo(id) {
+            window.location.href = "foodInfo?foodid=" + id;
+        }
+
+    </script>
+</head>
+<body class="pabS">
+<header data-am-widget="header" class="am-header am-header-default topform bheader">
+        <div class="am-header-left am-header-nav">
+            <a href="index">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+		  搜索
+		  </h1>
+    </header>
+    <!-- 搜索 -->
+    <div class="bred">
+    	 <div class="am-g searchPage">
+        <input type="text" id="search"  class="am-form-field red" name='search' placeholder="请输入食材或菜品">
+            <img class="search" src="/Content/img/search.png" onclick="search()" alt="">
+       </div>
+    </div>
+
+     <div class="cmn cmnb am-list-news am-list-news-default">
+           <div class="am-padding-xs am-text-sm red bgeee">搜索记录:</div>
+                <div class="am-list-news-bd"> 
+                    <ul class="am-list listFood searchListall" id="food">
+
+                    </ul>
+                    </div>
+                  </div> 
+                      <!-- 不显示 -->
+    <div data-am-widget="navbar" class="am-hide am-navbar am-shadow am-cf am-navbar-default amft" id="">
+        <div class="am-u-sm-8 a">
+            <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA">0</span></span>
+            <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0</span>
+            <span class="ff am-text-sm gray" style="display: inline-block;">| 包含<span class="am-icon-cny" id="servmoney"></span>服务费
+            <input type="hidden" id="fee" name="servmoneydata" value="0">
+            </span>
+        </div>
+        <div class="am-u-sm-4 b">
+            <button type='submit' class="am-btn">去结算</button>
+        </div>
+    </div>
+     <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    @*<script src="/Content/js/jquery.min.js"></script>*@
+    <script src="/Content/js/num_cailan.js"></script>
+
+</body>
+<script>
+    $(function () { 
+        $('#search').focus(function () {
+            $('.search').css('left','80%')
+        })
+    })
+</script>
+</html>

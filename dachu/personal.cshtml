@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>个人中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/app.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <link href="/Content/css/personal.css" rel="stylesheet">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var phone = "";
+        var userid = "";
+        $(function () {
+            getPhone() //获取存入session的电话
+        })
+        //获取存入session的电话
+        function getPhone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                  //  alert("请登录")
+                    // window.location.href = "signin";
+                    signin();
+                }
+                else {
+                    phone = data;
+                    $("#phone").html(data);
+                    AjaxJson("/CommonModule/Q_Users/getInfoByPhone", { phone: phone }, function (reInfo) {
+                        $.each(reInfo, function (i) {
+                            $("#jifen").html(reInfo[i].integral)
+                            userid = reInfo[i].userid;
+                            if (reInfo[i].userimage == null) {
+                                $("#img").attr("src", "/Content/images/gerentpic_03.png")
+                            }
+                            else {
+                                $("#img").attr("src", reInfo[i].userimage)
+                            }
+                        })
+                    })
+                }
+            })
+        }
+
+
+        function Cancellation() {
+            getAjax("/CommonModule/Q_Users/Cancellation", {}, function (data) {
+                if (data == "0") {
+                    alert("注销成功")
+                }
+                else {
+                    alert("注销失败")
+                }
+            })
+        }
+
+        function preview(obj) {
+            var resu = "";
+            var file = obj.files[0];
+            //判断类型是不是图片
+            if (!/image\/\w+/.test(file.type)) {
+                alert("请确保文件为图像类型");
+                return false;
+            }
+            var reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = function (e) {
+                var resu1 = this.result;//就是base64
+                if (file.type=="image/png") {
+                    resu = resu1.substring(22, resu1.length);//去掉前面前缀
+                }
+                else if (file.type=="image/jpeg") {
+                    resu = resu1.substring(23, resu1.length);//去掉前面前缀
+                }
+                else if (file.type == "image/gif") {
+                    resu = resu1.substring(22, resu1.length);//去掉前面前缀
+                }
+                getAjax("/CommonModule/Q_Users/uploadImg", { userid: userid, img: resu }, function (data) {
+
+                    if (data == "0") {
+                        alert("上传失败")
+                    }
+                    else {
+                        $("#img").attr("src", data);
+                    }
+                })
+            }
+        }
+    </script>
+</head>
+<body class="paddfoot">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform bheader" style="width:100%;height: 49px;">
+
+        <h1 class="am-header-title">我的</h1>
+    </header>
+
+    <div class="per_top">
+        <a href="signin" class="signin">登 录</a>
+        <img id="img" src="/Content/images/gerentpic_03.png" alt="">
+        <input type="file" name="" id="picFile" class="picUpload" onchange="preview(this)" />
+    </div>
+    <div class="sub_info">
+        <!-- 没登陆 -->
+        <!-- <span class="no_sign">绑定手机</span> -->
+        <!-- 已登录 -->
+        <span class="yes_sign" id="phone"></span>
+        <span class="integral">当前积分：<span id="jifen"></span></span>
+    </div>
+    <div class="per_list">
+        <ul>
+            <li>
+                <a href="memRecharge">
+                    会员卡
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    购物车
+                </a>
+            </li>
+            <li>
+                <a href="orderManage">
+                    订单管理
+                </a>
+            </li>
+            <li>
+                <a href="address">
+                    地址管理
+                </a>
+            </li>
+            <li>
+                <a href="vouchers">
+                    抵用券
+                </a>
+            </li>
+            <li>
+                <a href="myIntegral">
+                    我的积分
+                </a>
+            </li>
+            <li>
+                <a href="setUp">
+                    个人设置
+                </a>
+            </li>
+            <li>
+                <a href="accountSecurity">
+                    帐号安全
+                </a>
+            </li>
+            <li onclick="Cancellation()">
+                <a href="" class="cancellation">
+                    注销
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal" class="active">
+                    <span class=""><img src="/Content/img/gr2.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- 登录提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">请登录</div>
+                </div>
+            </div>
+            <div class="btnGp">
+              @*  <button type='button' class="bno beee whtie closem closetk">取消</button>*@
+                <button type='button' id="sub" class="bno bred white closem ok">确定</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script>
+    function signin() {
+        $('.tk').css('display', 'block');
+    }
+    //$('.closetk').on('click', function () {
+    //    $('.tk').css('display', 'none');
+    //})
+    $('.ok').on('click', function () {
+        window.location.href = "signin";
+    })
+</script>
+
+</html>

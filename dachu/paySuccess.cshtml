@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="../../css/amazeui.min.css">
+    <link rel="stylesheet" href="../../css/app.css">
+</head>
+
+<body class="pabo">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="order.html">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            支付
+        </h1>
+    </header> 
+    <form action='' id='makeformToPayOrder' method="post">
+    <div class="am-list-news-bd">
+      <ul class="am-list">
+        <li class="am-g">
+          <a href="javascript:" class="am-list-item-hd"><img src="../../img/marks.png" class="marks am-margin-right" alt=""><b>订单金额</b></a>
+          <span class="am-list-date red"><i class="am-icon-cny atf">178</i></span>
+        </li> 
+        <li class="am-g preduce">
+            <a href="javascript:;" class="am-list-item-hd" id="vippay">会员卡支付
+            <span class="am-list-date"><i class="am-icon-angle-right atf"></i></span>
+            </a>
+        </li>
+      </ul>
+     </div>
+
+    <!-- 支付成功弹框 -->
+
+    <div class="tk">
+         <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;"> 
+			 <div class="tktxt2">
+              <div class="am-text-center am-text-lg am-padding-sm popBg white">付款成功</div> 
+               <div class="am-text-center am-text-lg am-margin">
+                <b class="red">客服会通过84327788拨打您的手机:</b>
+                <br>
+                <p class="am-badge am-text-lg bred am-round am-padding-vertical-xs am-padding-horizontal-sm">15708546787</p>
+                <div class="red">请注意接听</div>
+				</div> 
+             </div>
+             <div class="btnGp">
+             	<button type='button' class="bno beee whtie closem">取消</button>
+				  <button type='button' id="sub" class="bno bred white closem">确定</button>  
+             </div>
+				  
+          </div>
+     </div>
+     <div class="am-list-news-bd">
+      <ul class="am-list">
+        <li class="am-g am-list-item-dated">
+          <a href="javascript:" class="am-list-item-hd"><img src="../../img/marks.png" class="marks am-margin-right" alt=""><b>其他方式支付</b></a> 
+        </li> 
+        <li class="am-g preduce fpa">
+           <a href="javascript:;"  class="am-cf adc"> &nbsp;<img src="../../img/apple.png" class="payimg" alt="">&nbsp;Apple Pay <span class="am-icon-angle-right am-fr am-icon-xs"></span></a>
+        </li>
+        <li class="am-g preduce fpa">
+           <a  href="javascript:;" class="am-cf adc"> &nbsp;<img src="../../img/weixin.png" class="payimg" alt="">&nbsp;微信支付 <span class="am-icon-angle-right am-fr  am-icon-xs"></span></a>
+        </li>
+        <li class="am-g preduce fpa">
+				<a  href="javascript:;" class="am-cf adc"> &nbsp;<img src="../../img/ali.png" class="payimg" alt="">&nbsp;支付宝支付<span class="am-icon-angle-right am-fr  am-icon-xs"></span></a>
+        </li>
+        <li class="am-g preduce fpa">
+           <a href="" class="am-cf adc"> &nbsp;<img src="../../img/offline.png" class="payimg" alt="">&nbsp;线下支付<span class="am-icon-angle-right am-fr  am-icon-xs"></span></a>
+        </li>
+      </ul>
+     </div>
+    </form>
+</body>
+<script src="../../js/jquery.min.js"></script>
+<script src="../../js/amazeui.min.js" type="text/javascript"></script>
+<script>
+	      $(function(){ 
+         $('.closem').click(function() {  
+          $('.tk').fadeOut('fast'); 
+        }); 
+        })
+
+</script>
+</html>

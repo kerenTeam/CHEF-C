@@ -1,0 +1,161 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" type="text/css" href="/Content/css/order.css">
+    <script src="~/Content/js/jquery.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        $(function () {
+            getCookAccount()
+        })
+        //获取登录帐号和获取订单
+        function getCookAccount() {
+            var str = "";
+            var nameorder = "";
+            var statename = "";
+            var anniu = "";
+            getAjax("/CommonModule/Q_Users/getCookAccount", {}, function (data) {
+                if (data != "0") {
+                    AjaxJson("/CommonModule/Q_Users/getCookOrder", { account: data }, function (order) {
+                        nameorder = "您还没有新订单！";
+                        $.each(order, function (i) {
+                            nameorder = order[i].realname + ",您有新订单啦！";
+                            //order[i].state = 6
+                            if (order[i].state == 2) {
+                                statename = "待接单";
+                                anniu = "<a href='javascript:;' id='6' class='btn am-btn am-btn-danger submitBtn white sure' disabled>接单</a>";
+                            }
+                            if (order[i].state == 3) {
+                                statename = "服务中";
+                                anniu = " <a href='javascript:;' id='8' class='btn am-btn am-btn-danger white sure' >完成服务</a>";
+                            }
+                            if (order[i].state == 4) {
+                                statename = "已出发";
+                                anniu = "<a href='javascript:;' id='3' class='btn am-btn am-btn-danger white sure' >开始服务</a>";
+                            }
+                            if (order[i].state == 5) {
+                                statename = "订单有问题";
+                            }
+                            if (order[i].state == 6) {
+                                statename = "待出库";
+                                anniu = "<a href='javascript:;' class='btn am-btn am-btn-danger white sure' disabled>出库</a>";
+                            }
+                            if (order[i].state == 7) {
+                                statename = "退款中";
+                            }
+                            str += "<div class='manage am-shadow am-padding-sm am-margin-bottom-sm' id='" + order[i].poorderid + "'><div class='manageOrder'><p>" + order[i].name + "</p> <p>" + order[i].goodsphone + " &nbsp;&nbsp;&nbsp;&nbsp;<a class='tell' href='tel:" + order[i].goodsphone + "'><img src='/Content/img/phone.png' alt=''></a></p><p>" + order[i].address + "</p><p>" + order[i].appointmenttime + "</p><p class='am-cf manageBor'><span class='am-fl'>订单号: " + order[i].billno + "</span><span class='am-fr'>派单时间: " + order[i].billdate + "</span></p><p class='manageBtn am-text-right'><a onclick='hrefOrderInfo(\"" + order[i].poorderid + "\")' class='btn am-btn am-btn-danger am-radius' title=''>查看详情</a> " + anniu + "</p><div class='manageOrderStatus'>" + statename + "</div></div></div>";
+                        })
+                        $("#order").html(str);
+                        $("#nameorder").html(nameorder);
+
+                        var stateid, orderId
+                        var tels = document.getElementsByClassName('tell');
+                        var subs = document.getElementsByClassName('submitBtn');
+                        for (var i = 0; i < tels.length; i++) {
+                            tels[i].onclick = function () { 
+                                if (this.parentNode.parentNode.getElementsByClassName('submitBtn').length == 0) {
+                                    return;
+                                }
+                                this.parentNode.parentNode.getElementsByClassName('submitBtn')[0].removeAttribute('disabled');
+                            }
+                        }
+
+                        function myrefresh() { 
+                            window.location.reload();
+                        }
+                        setTimeout(myrefresh, 12000);
+
+                        $('.sure').on('click', function () {
+                            var tip = $(this).html();
+                            stateid = $(this).attr("id");
+                            orderId = $(this).parentsUntil('#order').find('.manage').attr('id');
+                            orderId = $(this).parents('.manage').attr('id');
+                            sure(tip);
+                        })
+                        function sure(obj) {
+                            $('.tk').fadeIn('fast');
+                            $('.tk').find(".content").html('确认要' + obj + '么？');
+
+                        }
+                        $('.closem').click(function () {
+                            $('.tk').fadeOut('fast');
+                        });
+                        $('#sub').click(function () {
+                            $('.tk').fadeOut('fast');
+                            getAjax("/CommonModule/Q_POOrder/PayWeiXinMoney", { orderid: orderId, state: stateid }, function (redate) {
+                                if (redate == 1) {
+                                    window.location.reload();
+                                }
+                                else {
+                                    alert("操作错误");
+                                }
+
+                            })
+
+                        });
+                    })
+                }
+                else {
+                    alert("资料获取失败，请您重新登录！")
+                    window.location.href = "signin";
+                }
+            })
+        }
+        function hrefOrderInfo(id) {
+            window.location.href = "chefOrderInfo?id=" + id;
+        }
+
+        function states(number) {
+
+        }
+
+    </script>
+
+</head>
+
+<body>
+    <header data-am-widget="header" class="am-header am-header-default topform">
+
+        <h1 class="am-header-title">
+            厨师管理
+        </h1>
+        <div class="am-header-right am-header-nav">
+        </div>
+    </header>
+    <div class="bwhite am-padding-sm"><b id="nameorder"></b><a class="am-badge am-badge-danger am-radius am-margin-left-lg white" href=''>刷新</a></div>
+    <div id="order">
+
+    </div>
+    <!--提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red content"></div>
+                </div>
+            </div>
+            <div class="btnGp">
+                <button type='button' class="bno beee whtie closem">取消</button>
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+</body>
+<script src="/Content/js/jquery.min.js"></script>
+
+</html>

@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link href="~/Content/css/amazeui.min.css" rel="stylesheet" />
+    <link href="~/Content/css/app.css" rel="stylesheet" />
+    @*<script src="~/Content/Scripts/jquery/jquery-2.1.1.min.js"></script>*@
+    <script src="~/Content/js/jquery.min.js"></script>
+    <script src="~/Content/Scripts/cookie/jquery.cookie.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+  
+    <script>
+        var CategoryId = GetQuery("id");
+        $(function () {
+            FoodCategory();//加载菜品分类
+            Food();//加载菜品
+        })
+
+        //加载菜品分类
+        function FoodCategory() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_FoodCategory/getCategoryAll", {}, function (data) {
+                $.each(data, function (i) {
+                    str += "<li onclick='Food(\"" + data[i].foodcategoryid + "\")'><a class='am-vertical-align'><img  src='" + data[i].imgaddress + "' class='am-vertical-align-middle' alt=''> <span class='am-vertical-align-middle'>" + data[i].name + "</span></a></li>";
+                })
+                $("#foodcategory").html(str);
+            })
+        }
+
+        //加载菜品
+        function Food(categoryid) {
+            var food = "";
+            var foods;
+            if ($.cookie("Food") != null) {
+                food = $.cookie("Food");
+                foods = eval('(' + food + ')');
+            }
+            if (categoryid == null) {
+                if (CategoryId=="") {
+                    CategoryId = "3a511539-fb3f-401f-afaa-d204bfc678b4";
+                }
+                categoryid = CategoryId;
+            }
+            var categoryname = "";//分类名称
+            var categoryimg = "";//分类图片
+            //传入分类主键获取该行数据
+            AjaxJson("/CommonModule/Q_FoodCategory/getCategoryNameById", { CategoryId: categoryid }, function (categorydata) {
+                $.each(categorydata, function (i) {
+                    categoryname = categorydata[i].name;
+                    categoryimg = categorydata[i].imgaddress;
+                })
+            })
+            var str = "";
+            var number = 0;
+            AjaxJson("/CommonModule/Q_Food/getFoodByCategoryId", { CategoryId: categoryid }, function (data) {
+                $.each(data, function (i) {
+                    var Recommend = "";
+                    for (var j = 0; j < data[i].recommend; j++) {
+                        Recommend += "<img src='/Content/img/htw.png' class='htw' alt=''>";
+                    }
+
+                    if (food.length < 5) {
+                        str += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left '><a onclick='hrefFoodInfo(\"" + data[i].foodid + "\")'><img  src='" + data[i].thumbnail + "' class='lazy' data-original='" + data[i].thumbnail + "' alt=''><div class='am-cf topBrief'><div class='am-fl am-text-sm white am-vertical-align'><span class='am-vertical-align-middle vgname'>" + data[i].foodname + "</span></div><div class='am-fr am-vertical-align-middle'><span class='intoIndex'><span class='am-text-xs white'>推荐指数</span><span id='tuijian'>" + Recommend + "</span></span><span class='am-text-xs white'>总销 <span>" + data[i].cumulativenumber + "份</span></span></div></div></a><div class='numChange am-vertical-align'><div class='pr red am-vertical-align-middle'><span class='price am-icon-cny priceNew'>" + data[i].foodprice + "</span> /份</div><div class='foodNum am-vertical-align-middle'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='handle(this, false,\"" + data[i].foodid + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='foodueserWrite(this,\"" + data[i].foodid + "\")' value='0'><span class='add am-icon-plus-square' onclick='handle(this, true,\"" + data[i].foodid + "\")'></span></div></div></li>";
+                    }
+                    else {
+                        number = 0;
+                        $.each(foods, function (k) {
+                            
+                            if (foods[k].FoodId == data[i].foodid) {
+                                number = foods[k].Number;
+                            }
+                        })
+                        str += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left '><a onclick='hrefFoodInfo(\"" + data[i].foodid + "\")'><img  src='" + data[i].thumbnail + "' class='lazy' data-original='" + data[i].thumbnail + "' alt=''><div class='am-cf topBrief'><div class='am-fl am-text-sm white am-vertical-align'><span class='am-vertical-align-middle vgname'>" + data[i].foodname + "</span></div><div class='am-fr am-vertical-align-middle'><span class='intoIndex'><span class='am-text-xs white'>推荐指数</span><span id='tuijian'>" + Recommend + "</span></span><span class='am-text-xs white'>总销 <span>" + data[i].cumulativenumber + "份</span></span></div></div></a><div class='numChange am-vertical-align'><div class='pr red am-vertical-align-middle'><span class='price am-icon-cny priceNew'>" + data[i].foodprice + "</span> /份</div><div class='foodNum am-vertical-align-middle'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='handle(this, false,\"" + data[i].foodid + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='foodueserWrite(this,\"" + data[i].foodid + "\")' value='" + number + "'><span class='add am-icon-plus-square' onclick='handle(this, true,\"" + data[i].foodid + "\")'></span></div></div></li>";
+                    }
+                })
+                $("#categoryimg").attr("src", categoryimg);
+                $("#categoryname").html(categoryname);
+                $("#food").html(str);
+                var offset = $("#car").offset();
+                $(".add").click(function (event) {
+                    var addcar = $(this);
+                    var flyer = addcar.clone();
+                    var y = this.getBoundingClientRect().top;
+                    var x = this.getBoundingClientRect().left;
+                    flyer.fly({
+                        start: {
+                            left: x, //开始位置（必填）#fly元素会被设置成position: fixed
+                            top: y //开始位置（必填）
+                        },
+                        end: {
+                            left: offset.left + 10, //结束位置（必填）
+                            top: offset.top + 10, //结束位置（必填）
+                            width: 0, //结束时宽度
+                            height: 0 //结束时高度
+                        },
+                        onEnd: function () { //结束回调
+                            // $("#msg").show().animate({width: '250px'}, 200).fadeOut(1000); //提示信息
+                            // addcar.css("cursor","default").removeClass('orange').unbind('click');
+                            // this.destory(); //移除dom
+                        }
+                    });
+                });
+            })
+
+        }
+
+        //跳转菜品详情页面
+        function hrefFoodInfo(id) {
+            window.location.href = "foodInfo?foodid=" + id;
+        }
+
+        function hrefOrder()
+        {
+            window.location.href = "cart";
+        }
+    </script>
+</head>
+<body style="background-color: #f7f7f7;">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform bheader" style="position:fixed!important;top:0px !important; width: 100%;height: 49px;z-index: 9999">
+        <div class="am-header-left am-header-nav">
+            <a href="index">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            菜谱
+        </h1>
+    </header>
+    <form action="" method='post' enctype="multipart/form-data">
+        <!-- 菜品栏目 -->
+        <div class="am-u-sm-3 cmn aml">
+            <nav class="scrollspy-nav" data-am-scrollspy-nav="{offsetTop: -48}" data-am-sticky="{top:49}">
+                @*<div class="red typec"><span class="am-icon-ellipsis-h"></span>&nbsp;分类</div>*@
+                <div class="red typec"><img src="~/Content/img/type_02.jpg" style="width:100%;" alt="Alternate Text" /></div>
+                <ul class="am-list typel" id="foodcategory"></ul>
+            </nav>
+        </div>
+        <!-- 菜品选择 -->
+        <div data-am-widget="list_news" class="am-u-sm-9 asp cmn amr" style="background-color: #dadada;">
+            <div class="cmn cmnb am-list-news am-list-news-default">
+                <div class="am-list-news-bd">
+                    <div class="cptit typeName" id="1"><img id="categoryimg" src="" alt=""><span id="categoryname"></span></div>
+                    <ul class="am-list listFood cookbook" id="food"></ul>
+
+                    <ul class="am-list listFood"></ul>
+                </div>
+            </div>
+        </div>
+        <!-- footer -->
+        <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft" id="">
+            <div class="am-u-sm-9 a">
+                <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA">0</span></span>
+                <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0</span>
+                <span class="ff am-text-sm gray" style="display: inline-block;">
+                    | 包含<span class="am-icon-cny" id="servmoney"></span>服务费
+                    <input type="hidden" id="fee" name="servmoneydata" value="0">
+                </span>
+            </div>
+            <div class="am-u-sm-3 b"  >
+                <button type='button' onclick=" hrefOrder()" class="am-btn">去结算</button>
+            </div>
+        </div>
+    </form>
+
+
+    <script>
+        $(function () {
+            /*  $('.typel li:first-child a').addClass('currentType');*/
+            if (CategoryId == '3a511539-fb3f-401f-afaa-d204bfc678b4') {
+                $('.typel li').eq(0).find('a').addClass('currentType');
+            }
+            if (CategoryId == 'e8e35fd9-ece8-4b21-bec2-378a837e7bbd') {
+                $('.typel li').eq(7).find('a').addClass('currentType');
+            }
+            if (CategoryId == 'fe7ad9a9-1bec-4929-b160-85f9a784f527') {
+                $('.typel li').eq(8).find('a').addClass('currentType');
+            }
+            $('.typel li').on('click', function () {
+                $('.typel li a').removeClass('currentType');
+                var curT = $(this);
+                curT.find('a').addClass('currentType');
+                var typeLi = curT.find('a span').text();
+                console.log($.trim(typeLi));
+                $('.typeName').each(function () {
+                    if ($.trim(typeLi) == $(this).find('span').html()) {
+                        $(this).css('display', 'block');
+                        // $(this).css('marginTop','49px');
+                        $('body').scrollTop(0);
+                        $(this).next('ul').css('display', 'block');
+                    } else {
+                        $(this).css('display', 'none');
+                        $(this).next('ul').css('display', 'none');
+                    }
+                })
+
+            })
+
+            $("img.lazy").lazyload();
+        })
+    </script>
+    <style>
+        .oo {
+            font-size: 20px;
+            z-index: 99999999;
+            -webkit-transition: 0.5s left linear, 0.5s top ease-in, 0.1s 0.5s visibility linear;
+            transition: 0.5s left linear, 0.5s top ease-in, 0.1s 0.5s visibility linear;
+        }
+
+        .typeName:not(:first-child),
+        .typeName:not(:first-child) + ul {
+            display: none;
+        }
+
+        .currentType {
+            background-image: url('/Content/img/bgs.png');
+            width: auto;
+            background-repeat: repeat;
+        background-size: cover;
+            border-right: 7px solid rgb(215, 45, 34)!important;
+        }
+
+            .currentType span {
+                color: white !important;
+            }
+
+            .currentType > img {
+                -webkit-filter: none !important;
+            }
+    </style>
+    <script src="~/Content/js/num_cailan.js"></script>
+    <script src="~/Content/js/jquery.fly.min.js"></script>
+    <script src="~/Content/js/jqueryLazyload.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            
+
+        });
+    </script>
+</body>
+
+</html>

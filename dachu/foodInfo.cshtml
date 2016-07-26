@@ -1,0 +1,277 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link href="~/Content/css/amazeui.min.css" rel="stylesheet" />
+    <link href="~/Content/css/app.css" rel="stylesheet" />
+    <script src="~/Content/js/jquery.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        var foodid = GetQuery("foodid");
+        $(function () {
+            foodInfo();//加载详情数据
+            FoodImg();//加载菜品详情图
+            Evaluate();//加载评论
+            Number(); //加载菜品数量
+        })
+        //加载详情数据
+        function foodInfo() {
+            var Recommend = "";
+            var foodstars = "";
+            var caipinstar = "";
+            var chushistar = "";
+            var fuwustar = "";
+            AjaxJson("/CommonModule/Q_Food/getInfoByFoodId", { foodid: foodid }, function (data) {
+
+                $.each(data, function (i) {
+                    $("#foodname").html(data[i].foodname)
+                    $("#foodname1").html(data[i].foodname)
+                    $("#price").html(data[i].foodprice)
+                    for (var j = 0; j < data[i].recommend; j++) {
+                        Recommend += "<img src='/Content/img/introHeart.png' class='am-vertical-align-middle heart2' alt=''>";
+                    }
+                    $("#zhishu").html(Recommend)
+                    $("#zongxiao").html(data[i].cumulativenumber)
+                    $("#zhuliao").html(data[i].ingredients)
+                    $("#fuliao").html(data[i].accessories)
+                    $("#jiejian").html(data[i].blurb)
+                    $("#scoure").html(data[i].foodstar)
+                    for (var j = 0; j < data[i].recommend; j++) {
+                        foodstars += "<i class='am-icon-heart'></i>";
+                    }
+                    $("#foodstar").html(foodstars)
+                    $("#evaluateNumber").html(data[i].evaluatenumber);
+                    $("#pinglunshu").html(data[i].evaluatenumber);
+                    $("#caipin").html(data[i].foodstar);
+                    $("#chushi").html(data[i].cookstar);
+                    $("#fuwu").html(data[i].waiterstar);
+                    for (var j = 0; j < data[i].foodstar; j++) {
+                        caipinstar += "<i class='am-icon-heart'></i>";
+                    }
+                    $("#caipinstar").html(caipinstar);
+                    for (var j = 0; j < data[i].cookstar; j++) {
+                        chushistar += "<i class='am-icon-heart'></i>";
+                    }
+                    $("#chushistar").html(chushistar);
+                    for (var j = 0; j < data[i].waiterstar; j++) {
+                        fuwustar += "<i class='am-icon-heart'></i>";
+                    }
+                    $("#fuwustar").html(fuwustar);
+                })
+            })
+        }
+        //加载菜品详情图
+        function FoodImg() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Img/getImgByFoodId", { foodid: foodid }, function (data) {
+                $.each(data, function (i) {
+                    str += "<li><img src='" + data[i].imgaddress + "' class='am-img-responsive card'></li>";
+                })
+                $("#foodimg").prepend(str);
+            })
+        }
+
+        //加载菜品评论
+        function Evaluate() {
+            var str = "";
+            var img = "";
+            AjaxJson("/CommonModule/Q_SingleFoodEvaluate/getEvaluateByFoodId", { foodid: foodid }, function (data) {
+                $.each(data, function (i) {
+                    var foodscore = "";
+                    if (data[i].username == null) {
+                        data[i].username = data[i].userphone;
+                    }
+                    if (data[i].userimage == null) {
+                        data[i].userimage = "/Content/img/userimg_03.png";
+                    }
+                    for (var j = 0; j < data[i].foodscore; j++) {
+                        foodscore += "<i class='am-icon-heart'></i>";
+                    }
+                    var time = data[i].createtime;
+                    str += "<div class='commentList am-cf'><div class='am-u-sm-2 am-center'><img src='" + data[i].userimage + "' class='am-circle comtimg' alt=''></div><div class='am-u-sm-10'><div class='am-comment-meta'><a href='javascript:;' class='am-comment-author'>" + data[i].username + "<span class='am-badge am-badge-danger am-margin-left-xs am-radius'>VIP</span></a><time class='am-fr'>" + time.substring(0, 10) + "</time></div><div class='am-padding-vertical-xs am-padding-horizontal am-text-xs'><div class='cent'>打分：<span id='dafen'>" + foodscore + "</span></div><div style='word-break: break-all;'>" + data[i].comment + "</div></div><ul data-am-widget='gallery' class='am-gallery am-avg-sm-4 am-gallery-default' id='foodevaluateimg' data-am-gallery='{ pureview: true }'>";
+                    //拿到评论主键获取评论图片
+                    AjaxJson("/CommonModule/Q_SingleFoodImg/getSingleImg", { singlefoodid: data[i].id }, function (ImgJson) {
+                        img = "";
+                        $.each(ImgJson, function (j) {
+                            img += "<li><div class='am-gallery-item'><a href=\"<?=IP.$val['address']?>\" class=''><img src='" + ImgJson[j].address + "' /></a></div></li>";
+                        })
+                    })
+                    str = str + img + "</ul></div></div>";
+                })
+
+                $("#pinglun").html(str);
+                //$("#foodevaluateimg").html(img);
+            })
+        }
+
+        //加载菜品数量
+        function Number()
+        {
+            var food = "";
+            var foods;
+            var number = 0;
+            if ($.cookie("Food")!=null) {
+                food = $.cookie("Food");
+                foods = eval('(' + food + ')');
+                $.each(foods, function (i) {
+                    if (foodid==foods[i].FoodId) {
+                        number = foods[i].Number;
+                    }
+                })
+                console.log(number)
+                $("#number").val(number)
+            }
+        }
+        function hrefOrder() {
+            window.location.href = "cart";
+        }
+    </script>
+</head>
+
+<body class="bpa">
+    <input type="hidden" id="foodid" />
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 id="foodname" class="am-header-title">
+            鲁家客制酒香鸭
+        </h1>
+    </header>
+    <!-- 详情 -->
+    <form action="" method="post" enctype="mutiltype/data">
+        <div class="foodinfo am-shadow am-padding-bottom-sm">
+            <!-- banner -->
+            <div data-am-widget="slider" class="am-slider am-slider-default fimg" data-am-slider='{}'>
+                <ul class="am-slides" id="foodimg"></ul>
+            </div>
+            <div class="am-cf relative height fitop">
+                <img src="/Content/img/marks.png" class="pal marks" alt="">
+                <div class="am-u-sm-7 palC">
+                    <p id="foodname1" class="am-text-default">鲁家客制酒香鸭</p>
+                    <div class="months am-margin-right">
+                        <span class="am-vertical-align-middle am-margin-right-xs am-text-xs red">推荐指数</span>
+                        <span id="zhishu">
+                            <img src="/Content/img/introHeart.png" class="am-vertical-align-middle heart2" alt="">
+                            <img src="/Content/img/introHeart.png" class="am-vertical-align-middle heart2" alt="">
+                            <img src="/Content/img/introHeart.png" class="am-vertical-align-middle heart2" alt="">
+                        </span>
+
+                        <br>
+                        <div class="red am-vertical-align-middle am-text-sm">总销<span id="zongxiao"></span>份</div>
+                    </div>
+                </div>
+                <div class="am-u-sm-5 palR am-text-center">
+                    <div class="pr red"><i class="am-icon-cny am-text-xl "></i><span class="price am-text-xl " id="price">38</span>/份</div>
+                    <div class="foodNum am-vertical-align-middle">
+                        <span class="reduce am-icon-minus-square" onclick="handle(this, false,foodid)"></span>
+                        <input type="text" class="numTxt" id="number" name="numbers[]" onkeydown="keydown(this)" onkeypress="    return IsNum(event)" oninput="foodueserWrite(this, foodid)" value="0">
+                        <span class="add am-icon-plus-square" onclick="handle(this, true,foodid)"></span>
+                        <!--  onClick="handle(this, true)" -->
+                    </div>
+                </div>
+            </div>
+            <div class="am-margin-sm borderTop foodIntro">
+                <p class="am-text-sm"><strong>主料：</strong><span id="zhuliao"></span></p>
+                <p class="am-text-sm"><strong>辅料：</strong><span id="fuliao"></span></p>
+                <p class="am-text-sm"><strong>简介：</strong> <span id="jiejian"></span></p>
+            </div>
+        </div>
+        <!-- 评价 -->
+        <div class="am-shadow mtXs">
+            <div class="blockHead am-padding-top-sm">
+                <img src="/Content/img/marks.png" class="marks am-marign--right sm am-vertical-align-middle"> 消费评价
+            </div>
+            <div class="am-g topBorder">
+                <div class="am-u-sm-7 am-cf am-margin-top-sm am-text-center am-vertical-align">
+                    <div class="red am-fl am-margin-right-xs am-vertical-align-middle"><span class="am-text-xl" id="scoure"></span>分</div>
+                    <div class="am-fl am-text-xs red am-vertical-align-middle">
+                        <span id="foodstar"></span>
+                        <br>
+                        <span class="am-text-xs black"> 共<span id="evaluateNumber"></span>人评价</span>
+                    </div>
+                </div>
+                <div class="am-u-sm-5 stars">
+                    <p class="am-text-xs red">
+                        <span class="am-text-right">菜品</span> <b id="caipin"></b><span style="width:60px" id="caipinstar"></span>
+                    </p>
+                    <p class="am-text-xs red">
+                        <span class="am-text-right">厨师</span> <b id="chushi"></b><span style="width:60px" id="chushistar"></span>
+                    </p>
+                    <p class="am-text-xs red">
+                        <span class="am-text-right">服务</span> <b id="fuwu"></b><span style="width:60px" id="fuwustar"></span>
+                    </p>
+                </div>
+            </div>
+            <p class="pbgc">网友点评 <span class="am-fr">(<b id="pinglunshu"></b>)</span></p>
+            <!-- 文字评论 -->
+            <div id="pinglun">
+               
+            </div>
+        </div>
+        <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft" style="bottom:51px;" id="">
+            <div class="am-u-sm-9 a">
+                <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA">0</span></span>
+                <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0</span>
+                <span class="ff am-text-sm gray" style="display: inline-block;">
+                    | 包含<span class="am-icon-cny" id="servmoney"></span>服务费
+                    <input type="hidden" id="fee" name="servmoneydata" value="0">
+                </span>
+            </div>
+            <div class="am-u-sm-3 b">
+                <button type='button' onclick="hrefOrder()" class="am-btn">去结算</button>
+            </div>
+        </div>
+    </form>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart" class="active">
+                    <span class=""><img src="/Content/img/cart2.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal/personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+   
+    <script src="~/Content/js/amazeui.min.js"></script>
+    <script src="~/Content/js/num_cailan.js"></script>
+</body>
+
+</html>

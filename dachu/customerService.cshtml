@@ -1,0 +1,170 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var phones = "";
+        $(function () {
+            getphone()
+
+            $('.ctmMessage button').on('click', function () {
+                if ($("#phone").val() == '' || !(/^1((3|4|5|8|7){1}\d{1}|70)\d{8}$/.test($("#phone").val()))) {
+                    //alert("请输入正确的手机号");
+                    sure();
+                }
+                else {
+                    $("#phone1").html($("#phone").val())
+                    getAjax("/CommonModule/Q_CustomerManager/AddInfo", { phone: $("#phone").val() }, function (data) {
+                        if (data == 1) {
+                            $('#my-alert').modal('open');
+                        }
+                        else {
+                            alert("召唤失败")
+                        }
+                    })
+                }
+            })
+        })
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phones = data;
+                    $("#phone").val(phones)
+                    $("#phone1").html(phones)
+                }
+            })
+        }
+    </script>
+
+
+</head>
+
+
+<body class="bwhite">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            专属客户经理
+        </h1>
+    </header>
+    <div class="ctmTop am-cf">
+        <img src="/Content/img/marks.png" class="marks am-margin-top" alt="">
+        <div class="am-fr am-vertical-align am-text-right">
+            <div class="am-inline-block am-text-lg am-vertical-align-middle">
+                睡梦
+                <br><span class="am-text-sm">我的客户经理</span>
+            </div>
+            <img src="/Content/img/user.jpg" class="am-circle ctmPic am-vertical-align-middle" alt="">
+        </div>
+    </div>
+    <div class="ctmMessage">
+        <p>
+            亲，您好
+            <br>很高兴为您服务，按键召唤，3分钟内我会拨打您的手机：
+        </p>
+        <input type="tel" id="phone" value="15708767896">
+        <button type="button" class="am-btn bred white am-btn-block am-radius am-margin-top-lg am-padding-sm">召唤我的客户经理</button>
+    </div>
+    <!-- model -->
+    <div class="am-modal am-modal-no-btn" tabindex="-1" id="my-alert">
+        <div class="am-modal-dialog am-radius popBg">
+
+            <div class="am-modal-bd am-margin-top-sm customBtn">
+                <p class="white">
+                    很高兴为您服务
+                    <br><small>
+                        我会通过8432778拨打您的电话。<br>
+                        <span class="am-badge am-text-sm am-padding-xs am-margin-top-xs bwhite red am-round" id="phone1"></span>
+
+                </p>
+                <a href="javascript:;" class="btn am-btn am-btn-sm am-btn-danger am-radius white" data-am-modal-close>好</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- 提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">请输入正确电话号码</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                @*<button type='button' class="bno beee whtie closem">取消</button>*@
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService" class="active">
+                    <span class=""><img src="/Content/img/kf2.png" alt=""></span>
+                    <span class="am-navbar-label">联系客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <script src="/Content/js/amazeui.min.js"></script>
+</body>
+<script>
+    function sure() {
+        $('.tk').fadeIn('fast');
+    }
+    $('.closem').click(function () { 
+        $('#phone').focus();
+             $('.tk').fadeOut('fast');
+             return false;
+        });
+</script>
+</html>

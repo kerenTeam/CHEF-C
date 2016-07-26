@@ -1,0 +1,423 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+    <script>
+        var poorderid = GetQuery("orderid");
+        var ischongzhi = GetQuery("ischongzhi");
+        var openid = "";
+        var ordermoney = 0;
+        var cardmoney = 0;
+        var orderid = "";
+        var state = 0;
+        $(function () {
+            getAjax("/commonmodule/weixinopenid/openid", {}, function (data1) {
+                openid = data1;
+            })
+            if (poorderid == "") {
+                getCard()//获取订单主键
+                getMoney()//获取订单金额
+            }
+            else {
+                AjaxJson("/CommonModule/Q_POOrder/GetAll", { poorder: poorderid }, function (money) {
+                    $.each(money, function (i) {
+                        ordermoney = money[i].paidmoney
+                        console.log(ordermoney)
+                        orderid = poorderid;
+                        state = money[i].state
+                        $("#paymoney").html(ordermoney);
+                    })
+                })
+            }
+            if (ischongzhi == 1) {
+                $('.vipcardPay').css('display', 'none');
+                $("#paymoney").html($.cookie("rechargeMoney"));
+            }
+            getCardMoney()//获取卡余额
+
+        })
+        //获取金额
+        function getMoney() {
+            getAjax("/CommonModule/Q_POOrder/getOrderMoney", {}, function (data) {
+                if (data == "0") {
+                    ordermoney = 0;
+                }
+                else {
+                    $("#paymoney").html(data);
+                    ordermoney = data;
+                }
+            })
+        }
+        //获取卡余额
+        function getCardMoney() {
+            AjaxJson("/CommonModule/Q_Users/getOpenId", { openid: openid }, function (data) {
+                $.each(data, function (i) {
+                    $("#cardmoney").html(data[i].balance)
+                    cardmoney = data[i].balance;
+                    if (parseFloat(ordermoney) > parseFloat(cardmoney)) {
+                        $('#sub').attr('disabled', 'disabled');
+                        $('#sub').removeClass('green');
+                        $('#sub').css('color', '#eee');
+                    }
+
+                })
+            })
+        }
+        //获取订单主键
+        function getCard() {
+            getAjax("/CommonModule/Q_POOrder/getOrderId", {}, function (data) {
+                orderid = data;
+                if (data == "0") {
+                    orderid = "";
+                } else {
+                    AjaxJson("/CommonModule/Q_POOrder/GetAll", { poorder: poorderid }, function (money) {
+                        $.each(money, function (i) {
+                            state = money[i].state;
+                        })
+                    })
+                }
+            })
+        }
+        function cardPay() {
+            if (parseFloat(ordermoney) > parseFloat(cardmoney)) {
+                alert("您余额不足，请选择其它方式支付");
+            }
+            else {
+                getAjax("/CommonModule/Q_POOrder/payCardMoney", { orderid: orderid, openid: openid }, function (data) {
+                    if (data == 1) {
+                        alert("支付成功")
+                        $.cookie("Food", null);
+                        $.cookie("Waiter", null);
+                        $.cookie("Cele", null);
+                        $.cookie("Dinner", null);
+                        $.cookie("Coupon", null);
+                        $.cookie("address", null);
+                        $.cookie("jifenmoney", 0);
+                        $.cookie("WaiterMoney", null);
+                        $.cookie("FoodMoney", null);
+                        $.cookie("DinnerMoney", null);
+                        $.cookie("CeleMoney", null);
+                        $.cookie("Number", null);
+                        $.cookie("FuwuMoney", null);
+                        window.location.href = "orderManage";
+                    }
+                    else {
+                        alert("支付失败")
+                    }
+                })
+            }
+        }
+
+        function OrderQuery() {
+            AjaxJson("/CommonModule/Q_POOrder/GetAll", { poorder: orderid }, function (data) {
+                $.each(data, function (i) {
+                    AjaxJson("/CommonModule/Weixin_Pay/OrderQuery", {}, function (redata) {
+
+                    })
+                })
+            })
+        }
+
+
+        function onBridgeReady() {
+            if (ischongzhi != 1) {
+                AjaxJson("/CommonModule/Weixin_Pay/GetPayConfig", { orderid: orderid, attach: "微信支付测试", body: "dadafds", openid: openid, price: "1", orderNum: "1833431773763549" }, function (data) {
+                    var a = eval('(' + data + ')');
+                    WeixinJSBridge.invoke(
+                           'getBrandWCPayRequest', {
+                               "appId": a.appId,     //公众号名称，由商户传入
+                               "timeStamp": a.timeStamp,         //时间戳，自1970年以来的秒数
+                               "nonceStr": a.nonceStr, //随机串
+                               "package": a.package,
+                               "signType": "MD5",         //微信签名方式：
+                               "paySign": a.paySign//微信签名
+                           },
+                           function (res) {
+                               if (res.err_msg == "get_brand_wcpay_request:ok") {
+                                   getAjax("/CommonModule/Q_POOrder/PayWeiXinMoney", { orderid: orderid, state: 1 }, function (payinfo) {
+                                       if (payinfo == 1) {
+                                           $.cookie("Food", null);
+                                           $.cookie("Waiter", null);
+                                           $.cookie("Cele", null);
+                                           $.cookie("Dinner", null);
+                                           $.cookie("Coupon", null);
+                                           $.cookie("address", null);
+                                           $.cookie("jifenmoney", 0);
+                                           $.cookie("WaiterMoney", null);
+                                           $.cookie("FoodMoney", null);
+                                           $.cookie("DinnerMoney", null);
+                                           $.cookie("CeleMoney", null);
+                                           $.cookie("Number", null);
+                                           $.cookie("FuwuMoney", null);
+                                           window.location.href = "orderManage";
+                                       }
+                                   })
+                               }
+                               else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+                                   alert("您支付过程中取消支付")
+                                   $('.wxpay').bind('click', function () {
+                                       doWxpay();
+                                   });
+                               }
+                               else if (res.err_msg == "get_brand_wcpay_request:fail") {
+                                   alert("支付失败")
+                                   $('.wxpay').bind('click', function () {
+                                       doWxpay();
+                                   });
+                               }
+                               //alert(res.err_code + res.err_desc + res.err_msg);
+                           }
+                       );
+                })
+            }
+            else {
+                var rechargeid = "";
+
+                getAjax("/CommonModule/Q_Recharge/rechargMoney", { openid: openid, money: $.cookie("rechargeMoney"), givemoney: $.cookie("givemoney"), fangshi: 1 }, function (payinfo) {
+                    if (payinfo == "0") {
+                        alert("预付订单失败")
+                    }
+                    else {
+                        rechargeid = payinfo;
+                        AjaxJson("/CommonModule/Weixin_Pay/GetRechargeConfig", { rechargeid: rechargeid, attach: "微信支付测试", body: "dadafds", openid: openid, price: "1", orderNum: "1833431773763549" }, function (data) {
+                            var a = eval('(' + data + ')');
+                            WeixinJSBridge.invoke(
+                                   'getBrandWCPayRequest', {
+                                       "appId": a.appId,     //公众号名称，由商户传入
+                                       "timeStamp": a.timeStamp,         //时间戳，自1970年以来的秒数
+                                       "nonceStr": a.nonceStr, //随机串
+                                       "package": a.package,
+                                       "signType": "MD5",         //微信签名方式：
+                                       "paySign": a.paySign//微信签名
+                                   },
+                                   function (res) {
+                                       if (res.err_msg == "get_brand_wcpay_request:ok") {
+                                           getAjax("/CommonModule/Q_Recharge/UpdateState", { id: rechargeid }, function (restate) {
+                                               if (restate == 2) {
+                                                   $.cookie("rechargeMoney", null);
+                                                   $.cookie("givemoney", null);
+                                                   alert("充值成功");
+                                                   window.location.href = "memRecharge";
+                                               }
+                                               else if (restate == 1) {
+                                                   alert("支付成功，但并未存入会员卡")
+                                               }
+                                               else {
+                                                   alert("存储信息失败");
+                                               }
+                                           })
+
+                                       }
+                                       else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+                                           alert("您支付过程中取消支付")
+                                           $('.wxpay').bind('click', function () {
+                                               doWxpay();
+                                           });
+                                       }
+                                       else if (res.err_msg == "get_brand_wcpay_request:fail") {
+                                           alert("支付失败")
+                                           $('.wxpay').bind('click', function () {
+                                               doWxpay();
+                                           });
+                                       }
+                                       //alert(res.err_code + res.err_desc + res.err_msg);
+                                   }
+                               );
+                        })
+                    }
+                })
+
+            }
+
+        }
+        function doWxpay() {
+            if (state > 0) {
+                alert("您已支付订单，无需重复支付！")
+            }
+            else {
+                $('.wxpay').unbind('click');
+                if (typeof ('WeixinJSBridge') == "undefined") {
+                    alert('WeixinJSBridge:undefined');
+                    if (document.addEventListener) {
+                        document.addEventListener('WeixinJSBridgeReady', onBridgeReady, false);
+                    } else if (document.attachEvent) {
+                        document.attachEvent('WeixinJSBridgeReady', onBridgeReady);
+                        document.attachEvent('onWeixinJSBridgeReady', onBridgeReady);
+                    }
+                } else {
+                    onBridgeReady();
+                }
+            }
+        }
+
+        function hrefordermanage() {
+            $.cookie("Food", null);
+            $.cookie("Waiter", null);
+            $.cookie("Cele", null);
+            $.cookie("Dinner", null);
+            $.cookie("Coupon", null);
+            $.cookie("address", null);
+            $.cookie("jifenmoney", 0);
+            $.cookie("WaiterMoney", null);
+            $.cookie("FoodMoney", null);
+            $.cookie("DinnerMoney", null);
+            $.cookie("CeleMoney", null);
+            $.cookie("Number", null);
+            $.cookie("FuwuMoney", null);
+            window.location.href = "ordermanage";
+        }
+        //function onBridgeReady() {
+        //    WeixinJSBridge.invoke(
+        //        'getBrandWCPayRequest', {
+        //            "appId": "wx8655702929a5ad7d",     //公众号名称，由商户传入
+        //            "timeStamp": "1395712654",         //时间戳，自1970年以来的秒数
+        //            "nonceStr": "e61463f8efa94090b1f366cccfbbb444", //随机串
+        //            "package": "prepay_id=u802345jgfjsdfgsdg888",
+        //            "signType": "MD5",         //微信签名方式：
+        //            "paySign": "70EA570631E4BB79628FBCA90534C63FF7FADD89" //微信签名
+        //        },
+        //        function (res) {
+        //            if (res.err_msg == "get_brand_wcpay_request:ok") {
+        //                //支付成功，后续自行处理
+
+        //            }
+        //            else {
+        //                //支付取消，或者其他错误，自行处理
+        //            }
+        //        }
+        //    );
+        //}
+
+    </script>
+</head>
+
+<body class="pabo">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a onclick="history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            支付
+        </h1>
+    </header>
+    <form action='' id='makeformToPayOrder' method="post">
+        <div class="am-list-news-bd bwhite">
+            <ul class="am-list">
+                <li class="am-g">
+                    <a href="javascript:" class="am-list-item-hd paymtop"><img src="/Content/img/marks.png" class="marks am-margin-right" alt=""><b>订单金额</b></a>
+                    <span class="am-list-date red"><i class="am-icon-cny atf" id="paymoney"></i></span>
+                </li>
+                <li class="am-g preduce vipcardPay">
+                    <a class="am-list-item-hd" id="vippay">
+                        会员卡支付
+                        <span class="am-list-date"><i class="am-icon-angle-right atf atfr"></i></span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 会员卡支付弹框 -->
+
+        <div class="tk" style="display: none;">
+            <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+                <div class="tktxt2">
+                    <div class="am-text-center am-text-lg am-margin-sm">会员卡支付</div>
+                    <div class="am-text-center am-margin">
+                        当前余额<strong class="am-margin-right am-icon-cny pink" id="cardmoney"></strong>
+                    </div>
+                </div>
+                <button type='button' class="am-u-sm-6 bno gray closem">取消</button>
+                <button type='button' id="sub" onclick="cardPay()" class="am-u-sm-6 bno green">提交</button>
+            </div>
+        </div>
+        <div class="am-list-news-bd bwhite" style=" margin-top: -1.3rem;">
+            <ul class="am-list ">
+                <li class="am-g am-list-item-dated otherpay">
+                    <a href="javascript:" class="am-list-item-hd"><img src="/Content/img/marks.png" class="marks am-margin-right" alt=""><b>其他方式支付</b></a>
+                </li>
+
+                <li class="am-g preduce fpa wxpay" onclick="doWxpay()">
+                    <a class="am-cf adc"> &nbsp;<img src="/Content/img/weixin.png" class="payimg" alt="">&nbsp;微信支付 <span class="am-icon-angle-right am-fr  am-icon-xs"></span></a>
+                </li>
+                <li class="am-g preduce fpa">
+                    <a href="javascript:;" class="am-cf adc"> &nbsp;<img src="/Content/img/ali.png" class="payimg" alt="">&nbsp;支付宝支付<span class="am-icon-angle-right am-fr  am-icon-xs"></span></a>
+                </li>
+                <li class="am-g preduce fpa">
+                    <a onclick="hrefordermanage()" class="am-cf adc"> &nbsp;<img src="/Content/img/offline.png" class="payimg" alt="">&nbsp;线下支付<span class="am-icon-angle-right am-fr  am-icon-xs"></span></a>
+                </li>
+            </ul>
+        </div>
+    </form>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class="">
+                        <img src="/Content/img/home1.png" alt="">
+                    </span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">
+                        购物车
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</body>
+
+<script src="/Content/js/amazeui.min.js" type="text/javascript"></script>
+<script>
+    $(function () {
+        $('#vippay').click(function () {
+            $('.tk').fadeIn('fast');
+        });
+        $('.closem').click(function () {
+            $('.tk').fadeOut('fast');
+        });
+        $('#sub').click(function () {
+            $('.tk').fadeOut('fast');
+        });
+    })
+
+</script>
+</html>

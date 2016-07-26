@@ -1,0 +1,322 @@
+.sbnt .am-selected{
+	border-radius: 0;
+}
+.sbnt .am-btn-danger{
+	background-color: #d72d22;
+}
+.pform{
+	margin-bottom: 10rem;
+}
+.ptahr{
+	border-top: 3px solid #ddd;
+}
+.quanp{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+}
+.columns{
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	padding-top: 49px;
+	background-image: url(../images/dinnerBg_02.jpg);
+	background-size: cover;
+}
+.sc-content-container{
+	background-image: url(../images/artistB_02.jpg);
+	background-size: cover;
+}
+.headk{
+	height: 49px;
+}
+.am-slider-default{
+	margin: 0;
+}
+.serviceDiv{
+	padding: 3rem 0 0 0;
+}
+.serviceDiv h2{
+	    padding-left: 18%;
+    background: url(../img/marks.png) no-repeat;
+    background-size: auto 88%;
+    font-size: 1.6rem;
+}
+.serviceDiv h2 small{
+	  font-size: 97%;
+    margin-right: 9%;
+}
+.serviceDiv .serviceP{
+    padding-left: 18%;
+    font-weight: 600;
+    font-size: 1.3rem;
+    margin: 2% auto;
+}
+.serviceHr{
+	margin: 0 auto;
+	width: 85%;
+}
+.serCtt{
+	    padding-top: 0;
+    margin-bottom: 2rem;
+    padding: 0 8% 0 15%;
+}
+.serSex img{
+	    width: 36%;
+    margin-right: .5rem;
+}
+.serSex .price{
+	font-size: 1.6rem;
+}
+.SerNum{
+	margin-right: -1rem;
+    font-size: 1.9rem;
+    margin-top: -3%;
+}
+.SerNum .add,.SerNum .reduce{
+        font-size: 2.4rem;
+}
+.SerNum .numTxt{
+    width: 2.2em;
+    margin-top: -0.6rem;
+    margin-right: -2%;
+    margin-left: -2%;
+}
+.CmType figcaption{
+	padding: .5rem 1rem;
+	color: #d72d22;
+}
+.CmType figcaption small{
+	padding: 0 .5rem;
+}
+.CmType figcaption span{
+	font-weight: bold;
+	line-height: 100%;
+	font-size: 2.2rem;
+}
+.CmType img {
+    width: 100%;
+    height: 13rem;
+}
+.pageDiv {
+    padding: 3rem 0 1rem;
+    position: relative; 
+}
+.pageDiv h2 {
+       padding-left: 18%;
+    background: url(../img/marks.png) no-repeat;
+    background-size: auto 87%;
+    margin-bottom: 1rem;
+    font-size: 1.8rem;
+}
+.pageDiv .pageP {
+    padding-left: 18%;
+    font-weight: 600;
+    font-size: 1rem;
+    margin: 1rem 0 0 0;
+}
+.zhu{
+        font-size: 1.5rem!important;
+}
+.pageDiv .pageP span{
+	display: inline-block;
+	width: 5rem;
+    font-size: 1.2rem;
+    white-space: nowrap;
+}
+.pageDiv .youNum{
+	position: absolute;
+	top: 3rem;
+	right: 2rem;
+	font-size: 2rem;
+}
+.youNum .fNum{
+	top: 3rem;
+}
+.pagePrice{
+	position: absolute;
+	top: 2rem;
+	right: 2rem;
+	font-size: 3rem;
+}
+.artNum span{
+   font-size: 2.7rem!important;
+}
+.artNum input{
+    margin-top: -0.75rem;
+}
+.am-accordion-gapped .nobor,.am-accordion-gapped .nobor.am-active{
+	border: none;
+}
+.dlMar strong{
+	margin-left: 5%;
+	vertical-align: middle;
+}
+.black{
+	color: #000;
+}
+.nobor .am-accordion-content ul>li{
+	border-bottom: none;
+}
+.pageCtt .black{
+	padding: 1rem;
+}
+.pageCtt .black img{
+	margin-bottom: .5rem;
+}
+.pageCtt .dlMar{
+	margin-bottom: .5rem !important;
+}
+.pageBtn{
+	position: fixed;
+	right: 1rem;
+	bottom: 5rem;
+}
+.pageBtn a{
+	background-color: #da2e22;
+	color: #fff;
+	padding: 3px 10px;
+	border-radius: 8px;
+	font-size: 1.4rem;
+}
+
+.contactCus{
+	height: auto;
+	background-color: #fff;
+}
+.contactKong{
+	height: 6rem;
+	background-color: #fff;
+	margin-bottom: 1rem;
+}
+a.contactGo{
+	padding-top: 2rem;
+	color: #fff;
+	top: -4.5rem;
+	FILTER: progid:DXImageTransform.Microsoft.Gradient(gradientType=0,startColorStr=#fd776f,endColorStr=#d72e23); /*IE 6 7 8*/ 
+
+	background: -ms-linear-gradient(top, #fd776f,  #d72e23);        /* IE 10 */
+
+	background:-moz-linear-gradient(top,#fd776f,#d72e23);/*火狐*/ 
+
+	background:-webkit-gradient(linear, 0% 0%, 0% 100%,from(#fd776f), to(#d72e23));/*谷歌*/ 
+
+	background: -webkit-gradient(linear, 0% 0%, 0% 100%, from(#fd776f), to(#d72e23));      /* Safari 4-5, Chrome 1-9*/
+
+	background: -webkit-linear-gradient(top, #fd776f, #d72e23);   /*Safari5.1 Chrome 10+*/
+
+	background: -o-linear-gradient(top, #fd776f, #d72e23);  /*Opera 11.10+*/
+}
+.gsf{
+	padding: .5rem 0;
+}
+.gsf .price {
+    position: initial;
+    right: 0;
+}
+.gsf .price {
+    font-size: inherit;
+}
+.gsf .fNum{
+	position: initial;
+	display: inline-block;
+	vertical-align: middle;
+}
+.fNum span{
+	line-height: 0;
+}
+.zhu{
+	padding-right: 2rem;
+}
+.columns,.sixteen,.project{
+	height: 100% !important;
+}
+@font-face
+{
+font-family: myFirstFont;
+src: url('../fonts/MFLiHei_Noncommercial-Regular.otf')
+}
+.sky-carousel .sc-content-wrapper .artistTit{
+	font-family: myFirstFont;
+	color: #ffe87b;
+}
+.artistBtm{
+	padding: .8rem 10%;
+	text-align: left;
+}
+.sky-carousel .sc-content-wrapper .artistP{
+	color: #fff;
+	font-size: 1rem;
+}
+.sky-carousel .sc-content-wrapper .artistP .yuex{
+	color: #d72d22;
+	padding: 0 8px;
+	border-radius: 10px;
+	background-color: #fff;
+}
+.artToImg{
+	width: 100%;
+	display: block;
+	position: absolute;
+	top: 42px;
+	left: 0;
+	z-index: 99999;
+	vertical-align: top;
+}
+.artBtmImg{
+	width: 100%;
+	display: block;
+	position: absolute;
+	top: -10%;
+	left: 0;
+	z-index: 99999;
+}
+.partyWu{
+	top: -20%;
+}
+.pageCtt .black img{
+	max-width: 100%;
+}
+
+@media(max-width:375px) {
+    .SerNum .numTxt {
+        width: 2em;
+            margin-top: -0.55rem;
+    }
+    .SerNum{
+            margin-top: -8.5%;
+    }
+    .artNum span {
+    font-size: 2.5rem!important;
+}
+}
+@media(max-width: 350px){
+	html{
+		font-size: 8px;
+	}
+	.partyWu{
+		top: -15%;
+	}
+}
+@media(min-width: 350px) and (max-width: 450px){
+	html{
+		font-size: 10px;
+	}
+}
+@media(min-width: 450px) and (max-width: 600px){
+	html{
+		font-size: 12px;
+	}
+}
+@media(min-width: 600px){
+	html{
+		font-size: 16px;
+	}
+
+	.pageDiv .pageP span{
+		width: 5.5rem;
+	}
+	.partyWu{
+		top: -35%;
+	}
+}

@@ -1,0 +1,162 @@
+
+/* 登录 */
+.signin_body{
+	background-color: #d72d22;
+}
+.signin_t_pic{
+	padding: 12% 20%;
+}
+.signin_t_pic img{
+	width: 100%;
+}
+.signin_form img{
+	width: 15%;
+	display: block;
+	margin: 0 auto;
+}
+.signin_form input{
+	padding: 2%;
+	font-size: 1.6rem;
+	text-align: center;
+	border-radius: 3rem;
+	display: block;
+	margin: 0 auto;
+	margin-top: 20px;
+	width: 65%;
+	border:none;
+	color: #fff;
+}
+.signin_form .onename{
+	background: url(../images/yonhumin_03.png) 7% center no-repeat;
+	background-color: #dd554c;
+	background-size: 6%;
+}
+.signin_form .sign_password{
+	background: url(../images/denlumima_03.png) 7% center no-repeat;
+	background-color: #e27d77;
+	background-size: 6%;
+}
+.signin_form .sign_btn{
+	background-color: #fefcfe;
+	color: #d92e22;
+	font-weight: 600;
+}
+.newone img{
+	width: 28%;
+	height: 2px;
+}
+.newone{
+	text-align: center;
+	margin-top: 12%;
+}
+.newone a{
+    display: inline-block;
+    color: #fff;
+    font-size: 1.4rem;
+    text-align: center;
+
+}
+.newone_foot{
+    margin: 15%;
+    margin-top: 10%;
+    margin-bottom: 0;
+    color: #fff;
+}
+.newone_foot a{
+	color: #fff;
+	text-decoration: underline;
+	margin-top: 0.4rem;
+}
+.newone_foot label input{
+	width: 0;
+	height: 0;
+	display: none;
+}
+.newone_foot label i{
+	font-size: 2rem;
+	color: transparent;
+	background: url(../images/shurukuang_03.png) 0 bottom no-repeat;
+	background-size: contain;
+}
+.newone_foot label input:checked~i{
+	background: url(../images/shuru2_03.png) 0 bottom no-repeat;
+	background-size: contain;
+}
+.mask{
+
+}
+.mask , .mask_in{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	padding: 11% 12%;
+
+}
+.mask_in{
+	background: url(../images/zhezhaopic.png) 0 -2rem no-repeat;
+	background-size: 100% 104%;
+	background-color: #000;
+	opacity: 0.5;
+}
+.mask a img{
+	width: 100%;
+}
+.mask a{
+	position: relative;
+	z-index: 100;
+}
+/* 注册 */
+.register_t_pic{
+	padding: 7% 35%;
+}
+.register_t_pic img{
+	width: 100%;
+}
+.regi_form{
+	padding: 0 10%;
+}
+.regi_form>input, .regi_form a input{
+	width: 100%;
+	padding: 2%;
+	border:2px solid #d72d22;
+	border-radius: .3rem;
+	margin-top: 1.5rem;
+}
+.regi_form>input.verification{
+	width: 40%;
+	background-color: #d72d22;
+	color: #fff;
+}
+.regi_form input.confirm{
+	background-color: #d72d22;
+	color: #fff;
+   margin-top: 10%;
+}
+.regi_form label{
+	margin-top: 20px;
+	margin-left: -0.3rem;
+}
+.regi_form label input{
+	width: 0;
+	display: none;
+}
+.regi_form label i{
+	color: transparent;
+	background: url(../images/hongquan.png) 0  no-repeat;
+	background-size: 100%;
+}
+.regi_form label input:checked~i{
+	background: url(../images/hongquangou.png) 0  no-repeat;
+	background-size: 100%;
+}
+/* 设置密码 */
+.regi_form .setmima{
+	margin-bottom: -1rem;
+	margin-top: 1.5rem;
+}
+/* 忘记密码 */
+.regi_form .newmima{
+	margin-top: 35% !important;
+}

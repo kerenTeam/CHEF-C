@@ -1,0 +1,108 @@
+.customBody {
+    padding-bottom: 75px;
+}
+
+.customFooter {
+    padding: 1rem 0;
+    height: auto;
+}
+
+.customBanner img {
+    width: 100%;
+}
+
+.customBtn {
+    text-align: center;
+}
+
+.customBtn .btn {
+    width: 80%;
+    font-size: 1.8rem;
+}
+
+.customForm {
+    padding-top: 3rem;
+}
+
+.customForm .am-form-group label {
+    font-weight: normal;
+    font-size: 1.4rem;
+    margin-top: 0.4rem;
+}
+
+.am-form .customAdd select {
+    float: left;
+    width: 33.33%;
+}
+
+.customForm select,
+.customForm input[type=tel] {
+    font-size: 1.3rem;
+}
+
+.customP {
+    margin: .5rem 0;
+    font-size: 1.4rem;
+    color: #999;
+}
+
+.am-modal-no-btn .am-modal-dialog {
+    border-radius: 10px;
+}
+
+.customModalP {
+    font-size: 1.5rem;
+    margin: 1rem 0 2rem;
+    color: #999;
+}
+
+.manage>h1 {
+    margin: .5rem 0 1rem;
+    padding: 0 .5rem;
+    font-size: 2rem;
+    font-weight: normal;
+}
+
+.manageOrder {
+    position: relative;
+    color: #666;
+}
+
+.manageOrder>p {
+    margin: 0;
+    font-size: 1.5rem;
+    padding: 0 .5rem;
+    line-height: 2.5rem;
+}
+
+.manageOrder>p img {
+    width: 2.5rem;
+}
+
+.manageOrderStatus {
+    position: absolute;
+    top: .5rem;
+    right: 1rem;
+    color: #eb6565;
+    font-size: 1.7rem;
+}
+
+.manageOrder>p.manageBor {
+    margin-top: .5rem;
+    border-top: 1px solid #eee;
+    line-height: 3rem;
+}
+
+.manageOrder>p.manageBtn {
+    margin-top: 1rem;
+    padding-right: 1rem;
+}
+
+.manageBtn .btn {
+    font-size: 1.4rem;
+}
+
+.botbor {
+    border-bottom: 1px solid #eee;
+    padding-bottom: 1rem;
+}

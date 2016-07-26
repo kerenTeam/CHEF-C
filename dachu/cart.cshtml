@@ -1,0 +1,474 @@
+﻿<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <script src="/Content/js/jquery.min.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var food = "";
+        var foods;
+        if ($.cookie("Food") != null) {
+            food = $.cookie("Food");
+            foods = eval('(' + food + ')');
+        }
+
+        $(function () {
+            var waiter = "";
+            var waiters;
+            if ($.cookie("Waiter") != null) {
+                waiter = $.cookie("Waiter");
+                waiters = eval('(' + waiter + ')');
+                $.each(waiters, function (i) {
+                    if (waiters[i].FoodId == 1) {
+                        $("#waiter1").val(waiters[i].Number)
+                    }
+                    else if (waiters[i].FoodId == 0) {
+                        $("#waiter0").val(waiters[i].Number)
+                    }
+                    else {
+                        $("#waiter2").val(waiters[i].Number)
+                    }
+                })
+            }
+            if ($.cookie("FuwuMoney") != 0) {
+                $("#servmoney").html($.cookie("FuwuMoney"));
+            } else {
+                $("#isdisplay").css("display", "none");
+            }
+
+            singlefood();//加载单个菜品
+            Dinner();//加载伴餐
+            Cele();//加载庆典
+        })
+        //加载单个菜品
+        function singlefood() {
+            var singlefoods = "";
+            var jiushui = "";
+            var taocan = "";
+            if (food.length > 5) {
+                console.log(food)
+                $.each(foods, function (j) {
+                    if (foods[j].Number != 0) {
+                        AjaxJson("/CommonModule/Q_Food/getInfoByFoodId", { foodid: foods[j].FoodId }, function (data) {
+                            $.each(data, function (i) {
+                                if (data[i].code == 1008) {
+                                    jiushui += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left'><div class='am-u-sm-3 am-text-center am-list-thumb'><a onclick='hreffoodInfo(\"" + data[i].foodid + "\")' class='vimg cartimg'><img src='" + data[i].thumbnail + "' id='img' alt='" + data[i].foodname + "' /></a></div><div class=' am-u-sm-9 am-list-main'><input type='hidden' name='foodid' value='" + data[i].foodid + "' /><h3 class='am-list-item-hd cartb'>" + data[i].foodname + "</h3><div class='pr red am-text-lg'><i class='am-icon-cny'></i><span class='price' id='price'>" + data[i].foodprice + "</span></div><div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='handle(this, false,\"" + data[i].foodid + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='foodueserWrite(this,\"" + data[i].foodid + "\")' value='" + foods[j].Number + "'><span class='add am-icon-plus-square' onclick='handle(this, true,\"" + data[i].foodid + "\")'></span></div><a onclick='hrefChange(\"" + foods[j].FoodId + "\")'><span class='am-icon-refresh am-fr red'></span></a><a class='am-fl red ats2'onclick='foodsure(\"" + foods[j].FoodId + "\")' ><img src='/content/img/trash.png' />清空</a></div></li>";
+                                }
+                                else if (data[i].code == 1999) {
+                                    taocan += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left'><div class='am-u-sm-3 am-text-center am-list-thumb'><a onclick='hreffoodInfo(\"" + data[i].foodid + "\")' class='vimg cartimg'><img src='" + data[i].thumbnail + "' id='img' alt='" + data[i].foodname + "' /></a></div><div class=' am-u-sm-9 am-list-main'><input type='hidden' name='foodid' value='" + data[i].foodid + "' /><h3 class='am-list-item-hd cartb'>" + data[i].foodname + "</h3><div class='pr red am-text-lg'><i class='am-icon-cny'></i><span class='price' id='price'>" + data[i].foodprice + "</span></div><div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='handle(this, false,\"" + data[i].foodid + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='foodueserWrite(this,\"" + data[i].foodid + "\")' value='" + foods[j].Number + "'><span class='add am-icon-plus-square' onclick='handle(this, true,\"" + data[i].foodid + "\")'></span></div><a class='red ats2' onclick='foodsure(\"" + foods[j].FoodId + "\")'><img  src='/content/img/trash.png'>清空</a></div></li>";
+                                }
+                                else {
+                                    singlefoods += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left'><div class='am-u-sm-3 am-text-center am-list-thumb'><a onclick='hreffoodInfo(\"" + data[i].foodid + "\")' class='vimg cartimg'><img src='" + data[i].thumbnail + "' id='img' alt=\"<?=$food['foodname'];?>\" /></a></div><div class=' am-u-sm-9 am-list-main'><input type='hidden' name='foodid' value='" + data[i].foodid + "' /><h3 class='am-list-item-hd cartb'>" + data[i].foodname + "</h3><div class='pr red am-text-lg'><i class='am-icon-cny'></i><span class='price' id='price'>" + data[i].foodprice + "</span></div><div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='handle(this, false,\"" + data[i].foodid + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='foodueserWrite(this,\"" + data[i].foodid + "\")' value='" + foods[j].Number + "'><span class='add am-icon-plus-square' onclick='handle(this, true,\"" + data[i].foodid + "\")'></span></div><a onclick='hrefChange(\"" + foods[j].FoodId + "\")'><span class='am-icon-refresh am-fr red'></span></a><a class='red ats2' onclick='foodsure(\"" + foods[j].FoodId + "\")' ><img src='/content/img/trash.png'/>清空</a></div></li>"
+                                }
+
+                            })
+                        })
+                    }
+                })
+
+                $("#singlefood").prepend(singlefoods);
+                $("#jiushui").html(jiushui);
+                $("#taocan").html(taocan);
+
+            }
+            if (singlefoods == "") {
+                $("#singlefood").parentsUntil('section').css('display', 'none')
+
+            }
+            if (taocan == "") {
+                $("#taocan").parentsUntil('section').css('display', 'none')
+
+            }
+            if (jiushui == "") {
+                $("#jiushui").parentsUntil('section').css('display', 'none')
+
+            }
+        }
+
+        function hrefChange(id) {
+            window.location.href = "change?id=" + id;
+        }
+        //加载庆典
+        function Cele() {
+            var dinner = "";
+            var dinners;
+            var qingdian = "";
+            var celename = "";
+            if ($.cookie("Cele") != null) {
+                dinner = $.cookie("Cele");
+                dinners = eval('(' + dinner + ')');
+                $.each(dinners, function (j) {
+                    if (dinners[j].Number != 0) {
+                        AjaxJson("/CommonModule/Q_Celebration/getCelebrationRowInfoById", { id: dinners[j].CeleId }, function (json) {
+                            $.each(json, function (k) {
+                                celename = json[k].name
+                            })
+                        })
+                        AjaxJson("/CommonModule/Q_details/getMessageById", { id: dinners[j].FoodId }, function (data) {
+                            $.each(data, function (i) {
+                                qingdian += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left'><div class='am-u-sm-3 am-text-center am-list-thumb'><a class='vimg cartimg'><img src='" + data[i].thumbnail + "' id='img' alt='" + data[i].name + "' /></a></div><div class=' am-u-sm-9 am-list-main'><input type='hidden' name='foodid' value='" + data[i].id + "' /><h3 class='am-list-item-hd cartb'>" + data[i].name + "</h3><div class='pr red am-text-lg'><i class='am-icon-cny'></i><span class='price' id='price'>" + data[i].price + "</span></div><div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='celehandle(this, false,\"" + data[i].id + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)'  oninput='celeueserWrite(this,\"" + data[i].id + "\")' value='" + dinners[j].Number + "'><span class='add am-icon-plus-square' onclick='celehandle(this, true,\"" + data[i].id + "\")'></span></div><a href='change'></a><a class='red ats2' onclick='celesure(\"" + dinners[j].FoodId + "\")' ><img src='/content/img/trash.png'/>清空</a></div></li>";
+                            })
+                        })
+                    }
+                })
+
+
+                $("#qingdian").html(qingdian)
+                $("#qingname").html(celename)
+            }
+            if (qingdian == "") {
+                $("#qingdian").parentsUntil('section').css('display', 'none');
+            }
+        }
+
+        //加载伴奏
+        function Dinner() {
+            var dinner = "";
+            var dinners;
+            var bancan = "";
+            if ($.cookie("Dinner") != null) {
+
+                dinner = $.cookie("Dinner");
+                dinners = eval('(' + dinner + ')');
+                $.each(dinners, function (j) {
+                    if (dinners[j].Number != 0) {
+                        AjaxJson("/CommonModule/Q_Dinner/getDinnerById", { id: dinners[j].FoodId }, function (data) {
+                            $.each(data, function (i) {
+                                bancan += "<li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left'><div class='am-u-sm-3 am-text-center am-list-thumb'><a class='vimg cartimg'><img src='" + data[i].img + "' id='img' alt='" + data[i].title + "' /></a></div><div class=' am-u-sm-9 am-list-main'><input type='hidden' name='foodid' value='" + data[i].id + "' /><h3 class='am-list-item-hd cartb'>" + data[i].title + "艺术家</h3><div class='pr red am-text-lg'><i class='am-icon-cny'></i><span class='price' id='price'>" + data[i].sprice + "</span></div><div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='dinnerhandle(this, false,\"" + data[i].id + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='dinnerueserWrite(this,\"" + data[i].id + "\")' value='" + dinners[j].Number + "'><span class='add am-icon-plus-square' onclick='dinnerhandle(this, true,\"" + data[i].id + "\")'></span></div><a href='change'></span></a><a class='red ats2' onclick='dinnersure(\"" + dinners[j].FoodId + "\")'><img src='/content/img/trash.png'/>清空</a></div></li>";
+                            })
+                        })
+                    }
+                })
+
+                $("#bancan").html(bancan);
+            }
+            if (bancan == "") {
+                $("#bancan").parentsUntil('section').css('display', 'none')
+
+            }
+            
+        }
+        function hreffoodInfo(id) {
+            window.location.href = "foodInfo?foodid=" + id;
+        }
+    </script>
+</head>
+
+<body class="bpa">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)" style="margin-top: 15px;">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            购物车
+        </h1>
+    </header>
+    <!-- content -->
+    <form action="cart_submit" method="get">
+        <section data-am-widget="accordion" class="am-accordion am-accordion-gapped sec-margin" data-am-accordion='{  }'>
+            <dl class="am-accordion-item dlMar">
+                <dt class="am-accordion-title">
+                    <img src="/Content/img/marks.png" class="marks" alt=""> 单点菜品
+                </dt>
+                <dd class="am-accordion-bd am-collapse am-in">
+                    <div class="am-accordion-content">
+                        <ul class="am-list cul" id="singlefood">
+                            <li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left' id="isdisplay">
+                                <span class="ff am-text-sm gray" style="display: inline-block;">
+                                    包含<span class="am-icon-cny red" id="servmoney"></span>服务费
+                                    <input type="hidden" id="fee" name="servmoneydata" value="0">
+                                    (0-240元的菜品收取60元服务费，240-300元的菜品收取差额服务费，300元以上不收取服务费。)
+                                </span>
+                            </li>
+                        </ul>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="am-accordion-item dlMar">
+                <dt class="am-accordion-title">
+                    <img src="/Content/img/marks.png" class="marks" alt=""> 酒水
+                </dt>
+                <dd class="am-accordion-bd am-collapse am-in">
+                    <div class="am-accordion-content">
+                        <ul class="am-list cul" id="jiushui"></ul>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="am-accordion-item dlMar">
+                <dt class="am-accordion-title">
+                    <img src="/Content/img/marks.png" class="marks" alt=""> 套餐
+                </dt>
+                <dd class="am-accordion-bd am-collapse am-in">
+                    <div class="am-accordion-content">
+                        <ul class="am-list cul" id="taocan"></ul>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="am-accordion-item dlMar">
+                <dt class="am-accordion-title">
+                    <img src="/Content/img/marks.png" class="marks" alt="">庆典
+                </dt>
+                <dd class="am-accordion-bd am-collapse am-in">
+                    <div class="am-accordion-content">
+                        <span class="am-badge am-badge-danger am-padding-sm am-text-sm am-block" id="qingname"></span>
+                        <ul class="am-list cul" id="qingdian"></ul>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="am-accordion-item dlMar">
+                <dt class="am-accordion-title">
+                    <img src="/Content/img/marks.png" class="marks" alt=""> 演艺伴奏
+                </dt>
+                <dd class="am-accordion-bd am-collapse am-in">
+                    <div class="am-accordion-content">
+                        <ul class="am-list cul" id="bancan"></ul>
+                    </div>
+                </dd>
+            </dl>
+            <dl class="am-accordion-item dlMar sercolor">
+                <dt class="am-accordion-title">
+                    <img src="/Content/img/marks.png" class="marks" alt=""> 服务
+                </dt>
+                <dd class="am-accordion-bd am-collapse am-in">
+                    <div class="am-accordion-content">
+                        <ul class="am-list">
+                            <li class="am-g am-padding-xs">
+                                <label class="am-checkbox am-success am-u-sm-5 serl">
+                                    服务员(男)
+                                </label>
+                                <input type="hidden" id="servTotal" value="0">
+                                <div class="epr am-text-center am-text-sm"><span class="price am-icon-cny red" id="serprice">80</span>/位</div>
+                                <div class="am-marign-top-sm am-fr cd">
+                                    <span class="reduce am-icon-minus-square red" onclick="waiterhandle(this, false, 1)"></span>
+                                    <input type="text" id="waiter1" oninput="waiterueserWrite(this,1)" class="serinput" readonly="" name="girl" value="0">
+                                    <span class="add am-icon-plus-square" onclick="waiterhandle(this, true, 1)"></span>
+                                </div>
+                            </li>
+                            <li class="am-g am-padding-xs">
+                                <label class="am-checkbox am-success am-u-sm-5 serl">
+                                    服务员(女)
+                                </label>
+                                <input type="hidden" id="servTotal2" value="0">
+                                <div class="epr am-text-center am-text-sm"><span class="price am-icon-cny red" id="serprice2">80</span>/位</div>
+                                <div class="am-marign-top-sm am-fr cd2">
+                                    <span class="reduce am-icon-minus-square red" onclick="waiterhandle(this, false, 0)"></span>
+                                    <input type="text" id="waiter0" oninput="waiterueserWrite(this,0)" class="serinput2" readonly="" name="girl" value="0">
+                                    <span class="add am-icon-plus-square" onclick="waiterhandle(this, true, 0)"></span>
+                                </div>
+                            </li>
+                            <li class="am-g am-padding-xs">
+                                <label class="am-checkbox am-success am-u-sm-5 serl">
+                                    餐具
+                                </label>
+                                <input type="hidden" id="servTotal3" value="0">
+                                <div class="epr am-text-center am-text-sm"><span class="price am-icon-cny red" id="serprice3">80</span>/套</div>
+                                <div class="am-marign-top-sm am-fr cd3">
+                                    <span class="reduce am-icon-minus-square red" onclick="waiterhandle(this, false, 2)"></span>
+                                    <input type="text" id="waiter2" class="serinput3" oninput="waiterueserWrite(this,3)" readonly="" name="" value="0">
+                                    <span class="add am-icon-plus-square" onclick="waiterhandle(this, true, 2)"></span>
+                                </div>
+                                <div class="am-cf"></div>
+                                <p class="am-padding-horizontal" style="margin: 0;">(此价格还包含一名服务员上门全程服务)</p>
+                            </li>
+                        </ul>
+                    </div>
+                </dd>
+            </dl>
+        </section>
+        <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft pabx" id="">
+            <div class="am-u-sm-9 a">
+                <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA">0</span></span>
+                <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0</span>
+
+            </div>
+            <div class="am-u-sm-3 b" style="margin-top:4.5%;">
+                <a href="order">
+                    <button type='button' class="am-btn">去结算</button>
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <!-- 删除提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">您确定要清空吗？</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                <button type='button' class="bno beee whtie closem">取消</button>
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart" class="active">
+                    <span class=""><img src="/Content/img/cart2.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <script src="/Content/js/amazeui.min.js"></script>
+    <script src="~/Content/js/Dinnernum_num.js"></script>
+    <script src="~/Content/js/Cele_num.js"></script>
+    <script src="~/Content/js/num_cailan.js"></script>
+    <script src="~/Content/js/Waiter_num.js"></script>
+    <script src="/Content/js/service.js"></script>
+</body>
+<script>
+    var foodsid = "";
+    var dis = 0;
+    var shuliang = 0;
+    function foodsure(obj) {
+        $('.tk').fadeIn('fast');
+        foodsid = obj;
+        dis = 1;
+    }
+    function celesure(id) {
+        $('.tk').fadeIn('fast');
+        foodsid = id;
+        dis = 2;
+    }
+
+    function dinnersure(id) {
+        $('.tk').fadeIn('fast');
+        foodsid = id;
+        dis = 3;
+    }
+    $('.closem').click(function () {
+        $('.tk').fadeOut('fast');
+    });
+
+    $('#sub').click(function () {
+        $('.tk').fadeOut('fast');
+        var number = 0
+        var fooddetails = "";
+        if (dis == 1) {
+            var food = $.cookie("Food");
+            var foods = eval('(' + food + ')');
+            var money = 0;
+            $.each(foods, function (i) {
+                if (foodsid == foods[i].FoodId) {
+                    fooddetails += '{"FoodId":"' + foodsid + '","Number":"0","Price":"' + foods[i].Price + '"},'
+                    shuliang = foods[i].Number;
+                }
+                else {
+                    fooddetails += '{"FoodId":"' + foods[i].FoodId + '","Number":"' + foods[i].Number + '","Price":"' + foods[i].Price + '"},'
+                    money += parseFloat(foods[i].Number) * parseFloat(foods[i].Price);
+                }
+            })
+            $.cookie("FoodMoney", money);
+            if (parseFloat($.cookie("FoodMoney")) >= 300) {
+                $.cookie("FuwuMoney", 0);
+            }
+            else {
+                if (parseFloat($.cookie("FoodMoney")) < 300 && parseFloat($.cookie("FoodMoney")) >= 240) {
+                    $.cookie("FuwuMoney", 300 - parseFloat($.cookie("FoodMoney")));
+                }
+                if (parseFloat($.cookie("FoodMoney")) < 240 && parseFloat($.cookie("FoodMoney")) > 0) {
+                    $.cookie("FuwuMoney", 60)
+                }
+                if (parseFloat(money) == 0) {
+                    $.cookie("FuwuMoney", 0);
+
+                }
+            }
+
+            foods = "[" + fooddetails + "]";
+            var foodfood = foods.replace("},]", "}]");
+            $.cookie("Food", foodfood);
+        } else if (dis == 2) {
+            var food = $.cookie("Cele");
+            var foods = eval('(' + food + ')');
+            var money = 0;
+            $.each(foods, function (i) {
+                if (foodsid == foods[i].FoodId) {
+                    fooddetails += '{"FoodId":"' + foodsid + '","Number":"0","CeleId":"' + foods[i].CeleId + '","Price":"' + foods[i].Price + '"},'
+                    shuliang = foods[i].Number;
+                }
+                else {
+                    fooddetails += '{"FoodId":"' + foods[i].FoodId + '","Number":"' + foods[i].Number + '","CeleId":"' + foods[i].CeleId + '","Price":"' + foods[i].Price + '"},'
+                    money += parseFloat(foods[i].Number) * parseFloat(foods[i].Price);
+                }
+            })
+            $.cookie("CeleMoney", money);
+            foods = "[" + fooddetails + "]";
+            var foodfood = foods.replace("},]", "}]");
+            console.log(foodfood)
+            $.cookie("Cele", foodfood);
+        } else if (dis == 3) {
+            var money = 0;
+            var food = $.cookie("Dinner");
+            var foods = eval('(' + food + ')');
+            $.each(foods, function (i) {
+                if (foodsid == foods[i].FoodId) {
+                    fooddetails += '{"FoodId":"' + foodsid + '","Number":"0","Price":"' + foods[i].Price + '"},'
+                    shuliang = foods[i].Number;
+                }
+                else {
+                    fooddetails += '{"FoodId":"' + foods[i].FoodId + '","Number":"' + foods[i].Number + '","Price":"' + foods[i].Price + '"},'
+                    money += parseFloat(foods[i].Number) * parseFloat(foods[i].Price);
+                }
+            })
+            $.cookie("DinnerMoney", money);
+            foods = "[" + fooddetails + "]";
+            var foodfood = foods.replace("},]", "}]");
+            console.log(foodfood)
+            $.cookie("Dinner", foodfood);
+        }
+        var numbers = $.cookie("Number");
+        numbers = parseFloat(numbers) - parseFloat(shuliang);
+        $("#allmoney").html(parseInt($.cookie("WaiterMoney")) + parseInt($.cookie("FoodMoney")) + parseInt($.cookie("DinnerMoney")) + parseInt($.cookie("CeleMoney")));
+        $.cookie("Number", numbers);
+        window.location.reload();
+    });
+
+
+
+</script>
+</html>

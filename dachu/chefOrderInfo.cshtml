@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var id = GetQuery("id");
+        $(function () {
+            getOrder();
+        })
+
+        //获取订单
+        function getOrder() {
+            var orderlist = "";
+            var money = 0;
+            AjaxJson("/CommonModule/Q_POOrder/getStateInfo", { orderid: id }, function (data) {
+                $.each(data, function (i) {
+                    AjaxJson("/CommonModule/Q_MemberAddress/getInfoById", { id: data[i].menberaddressid }, function (addressInfo) {
+                        $.each(addressInfo, function (q) {
+                            $("#name").html(addressInfo[q].name)
+                            $("#phone").html(addressInfo[q].goodsphone)
+                            $("#yuyue").html(new Date(data[i].appointmenttime).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, ''))
+                            $("#address").html(addressInfo[q].address)
+                        })
+                    })
+
+                    AjaxJson("/CommonModule/Q_POOrderEntry/getAllByOrderId", { poorderid: id }, function (entry) {
+                        $.each(entry, function (j) {
+                            orderlist += "<li class='am-padding-sm'><a class='vimg chefvimg'><img alt='' src='" + entry[j].thumbnail + "' class='orderImg'></a>" + entry[j].foodname + " <span class='am-fr am-margin-right-lg chefmgtop'>X " + entry[j].foodnumber + "</span></li>";
+                        })
+                    })
+                    if (data[i].sprice != undefined) {
+                        orderlist += "<li class='am-padding'><a href='javascript:' class='am-list-item-hd '> " + data[i].title + "艺术家  <span class='am-fr am-margin-right-lg'>X 1</span></li>";
+                        
+                    }
+                    AjaxJson("/CommonModule/Q_CelebrationEntry/getCele", { orderid: data[i].poorderid }, function (celedata) {
+                        $.each(celedata, function (q) {
+                            orderlist += "<li class='am-padding'><a href='javascript:' class='am-list-item-hd '>" + celedata[q].name + " <span class='am-fr am-margin-right-lg'>X " + celedata[q].detailsnumber + "</span></a></li> ";
+                        })
+                    })
+                    if (data[i].manwaiter != 0) {
+                        orderlist += "<li class='am-padding'><a href='javascript:' class='am-list-item-hd '> 男服务员 <span class='am-fr am-margin-right-lg'>X " + data[i].manwaiter + "</span></a></li> ";
+                    }
+                    if (data[i].wumenwaiter != 0) {
+                        orderlist += "<li class='am-padding'><a href='javascript:' class='am-list-item-hd '> 女服务员 <span class='am-fr am-margin-right-lg'>X " + data[i].wumenwaiter + "</span></a></li> ";
+                    }
+                    if (data[i].canju != 0) {
+                        orderlist += "<li class='am-padding'><a href='javascript:' class='am-list-item-hd '> 餐具 <span class='am-fr am-margin-right-lg'>X " + data[i].canju + "</span></a></li> ";
+                    }
+                    if (data[i].gooutfee != 0) {
+                        orderlist += "<li class='am-padding'><a href='javascript:' class='am-list-item-hd '> 服务费 <span class='am-fr gray'></span></a><span class='am-list-date ath'><i class='am-icon-cny'></i> " + data[i].gooutfee + "</span></li> ";
+                    }
+
+                    
+                    $("#orderlist").html(orderlist);
+                    $("#orderlist").append("<li class='am-g'><a href='javascript:' class='am-fr red'>订单总计:<i class='am-icon-cny red' id='money'>" + data[i].amount + "</i></a></li>");
+                })
+            })
+
+            
+        }
+
+    </script>
+
+
+
+
+
+</head>
+
+<body class="pabo">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="chefOrderManage">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            查看详情
+        </h1>
+    </header>
+    <div class="am-list-news-bd bwhite">
+        <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>订单详情</span></p>
+        <ul class="am-list odl">
+
+            <li class="am-g am-list-item-dated am-padding am-text-lg black">
+                <div>联系人：&nbsp;&nbsp;&nbsp;&nbsp;<b id="name"></b></div>
+                <div>联系电话：<b id="phone"></b></div>
+                <div>服务时间：<b id="yuyue"></b></div>
+                <div>服务地点：<b id="address"></b></div>
+            </li>
+        </ul>
+    </div>
+    <div class="am-list-news-bd am-margin-top-xs bwhite">
+        <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>菜品查看</span></p>
+        <ul class="am-list odl odM" id="orderlist">
+
+
+            
+
+
+        </ul>
+    </div>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">联系客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal" class="active">
+                    <span class=""><img src="/Content/img/gr2.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</body>
+</html>

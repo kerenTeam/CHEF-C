@@ -1,0 +1,557 @@
+/* 个人中心 */
+.per_top{
+ 	padding: 3% 38%;
+	position: relative;
+}
+.per_top img{
+    display: block;
+	width: 6em;
+    border-radius: 50%;
+    -webkit-border-radius: 50%;
+    height: 6em;
+}
+.per_top .signin{
+	position: absolute;
+	top: 10%;
+	right: 5%;
+	color: #d72d22;
+	font-weight: 500;
+}
+.sub_info{
+	text-align: center;
+	padding-bottom: 1rem;
+	border-bottom:.5rem solid #dadada;
+}
+.sub_info .integral{
+	display: block;
+	margin-top: 1rem;
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+.picUpload{
+    opacity: 0;
+    -webkit-opacity: 0;
+    position: absolute;
+    top: 15%;
+    height: 70%;
+    width: 20%;
+    /* left: 1%; */
+    margin-left: 2%;
+    border-radius: 50%;
+}
+.sub_info .yes_sign{
+	font-weight: 500;
+ 	font-size: 1.8rem;
+}
+.sub_info .no_sign{
+	padding: 1% 2%;
+	background-color: #d72d22;
+	border-radius: .5rem;
+	color: #fff;
+	font-size: 1.4rem;
+}
+.per_list li a{
+	display: block;
+    padding: 4% 15%;
+    padding-right: 0;
+    color: #1b1a20;
+    font-weight: 600;
+    font-size: 1.7rem;
+    background: url(../img/marks.png) 0 center no-repeat;
+    background-size: 12%;
+}
+.per_list li a.cancellation{
+	color: #d72d22;
+}
+.per_list li{
+	border-bottom: 0.2rem solid #dadada;
+}
+.per_list ul li:last-child{
+	border:none;
+}
+/* 没有会员卡 */
+.nocard{
+	margin-top: 45%;
+	text-align: center;
+}
+.nocard span{
+	display: block;
+	text-align: center;
+	margin-bottom: 20%;
+	font-size: 1.7rem;
+	font-weight: 600;
+
+}
+.nocard a{
+    margin-top: 10rem;
+    padding: 2% 30%;
+}
+/* 会员卡_old */
+.card_list li{
+	text-align: center;
+	background: url(../images/huiyuankabeijing_02.png) 0 bottom no-repeat;
+	background-size: 100%;
+	padding-bottom: 4%;
+	margin-top: 1.5rem;
+}
+.card_list li a img{
+	width: 86%;
+}
+/* 会员卡充值 */
+.balance{
+	 padding: 5%;
+	 text-align: center;
+	 border-bottom: .4rem solid #dadada;
+	 background: url(../images/baizuojiantouo_03.png) 95% center no-repeat;
+	 background-size: 3%;
+}
+.balance span ,.balance b{
+	display: inline-block;
+	vertical-align: middle;
+}
+.balance span{
+	font-size: 3rem;
+	color: #d72d22;
+
+}
+.balance b{
+	font-weight: 600;
+}
+.faceValues{
+	padding: 7% 5%;
+	padding-bottom: 3%;
+}
+.faceValues ul{
+	margin-left: -1.5%;
+}
+.faceValues ul:after{
+	content: '';
+	clear: both;
+	display: block;
+}
+.faceValues li{
+	width: 30%;
+	float: left;
+	margin-left: 3%;
+	margin-top: 3%;
+	padding: 2% 0;
+	text-align: center;
+	border:2px solid #dadada;
+}
+.faceValues li p{
+	font-size: 1.8rem;
+	font-weight: 700;
+	line-height: 1.5;
+}
+.faceValues li span{
+	font-size: 1.4rem;
+	color: #8a8a8a;
+}
+.faceValues ul .face_active{
+	color: #d72d22;
+	border:2px solid #d72d22;
+}
+.faceValues ul .face_active p ,.faceValues ul .face_active span{
+	color: #d72d22;
+}
+.Promotion{
+	text-align: center;
+	color: #d72d22;
+	margin-top: 1.5rem;
+	font-weight: 600;
+}
+.now_Recharge{
+	padding: 3% 0;
+	text-align: center;
+	margin: 0 auto;
+	width: 87%;
+	background-color: #d72d22;
+	border-radius: 3px;
+	color: #fff;
+   margin-top: 20%;
+   display: block;
+   border: none;
+}
+.add_agreement{
+	text-align: center;
+	color: #9d9d9d;
+	font-size: 1.4rem;
+	margin-top: 1rem;
+}
+.add_agreement a{
+	color: #d72d22;
+	text-decoration: underline;
+}
+/* 充值协议 */
+.re_argee_top{
+	background: url(../img/marks.png) 0 center no-repeat;
+	background-size: 15%;
+}
+.re_argee_top h3{
+	padding-left: 10%;
+	margin:0 5%;
+	border-bottom: 2px solid #dadada;
+	font-weight: 700;
+	line-height: 4;
+	padding-top: 1%;
+}
+.argee_mid{
+
+   padding: 3% 10%;
+   font-weight: 600;
+   line-height: 1.2;
+   font-size: 1.4rem;
+}
+.argee_mid div{
+	margin-top: 8%;
+} 
+
+/* 地址管理 */
+.add_list_t label i{
+	font-size: 2rem;
+	background: url(../images/dizhiquan_03.png) 0 bottom no-repeat;
+	background-size: contain;
+}
+.add_list_t label input:checked~i{
+	background: url(../images/dizhiquan2_03.png) 0 bottom no-repeat;
+	background-size: contain;
+}
+.add_list_t{
+	padding: 3% 0;
+	border-bottom: 1px solid #dadada;
+}
+.add_list_f{
+	padding: 3% 0;
+}
+.add_list_t>a{
+	color: #d72d22;
+	font-size: 1.2rem;
+ 	margin-left: .9rem;
+}
+.add_list_t>a>img{
+ 	width: 1.5rem;
+    margin-bottom: 8px;
+}
+.address_list ul{
+	padding:5% 5% 0%;
+	font-weight: 700;
+	border-bottom: .3rem solid #dadada;
+}
+.address_list ul li{
+	text-align: center;
+	
+}
+.add_add{
+	text-align: center;
+}
+.add_add a{
+	font-size: 1.8rem;
+	font-weight: 700;
+	padding: 3%;
+	display: inline-block;
+}
+.add_add a img{
+	width: 2rem;
+	margin-bottom: 0.2rem;
+}
+/* 新增地址 */
+.add_wrap{
+	padding: 5%;
+	font-weight: 600;
+}
+.add_list{
+	padding: 4% 2%;
+	border-bottom: 2px solid #dadada;
+	overflow: hidden;
+	line-height: 1.3;
+}
+.add_list span{
+	display: inline-block;
+	width: 22%;
+	text-align: center;
+}
+.add_list input{
+	width: 78%;
+	border: none;
+	padding-left: 5%;
+}
+.add_list span, .add_list input{
+	float: left;
+}
+.checke_list label{
+	float: left;
+	font-size: 1.8rem;
+
+}
+.checke_list{
+	overflow: hidden;
+	border-bottom: 2px solid #dadada;
+	padding-left: 28%;
+}
+
+.checke_list label:first-child{
+	margin-top: 10px;
+
+}
+.checke_list label:last-child{
+	margin-top: 10px;
+	margin-left: 15%;
+}
+.checke_list label input{
+	width: 1.4rem;
+	height: 1.4rem;
+}
+.add_phone a img{
+	width: 80%;
+}
+.add_phone{
+	position: relative;
+}
+.add_phone a{
+	position: absolute;
+    right: 0;
+    top: 25%;
+    margin-left: 93%;
+}
+.add_f_btn{
+	text-align: center;
+	margin-top: 10%;
+}
+.add_f_btn input{
+	border: none;
+    padding: 2% 40%;
+}
+/*编辑地址*/
+.testadd{
+    border:none;
+    width: 78%;
+    padding-left: 4%;
+}
+/* 抵用卷 */
+.voucher_list_f{
+	padding: 1% 0;
+	padding-left: 9%;
+	margin: 0 6%;
+ 	border-top: .2rem solid #dadada;
+	position: relative;
+}
+.voucher_list_f p{
+	line-height: 2;
+}
+.voucher_list_f .ri_pic{
+	position: absolute;
+	top: 8%;
+	right: 0;
+	width: 25%;
+	height: 85%;
+	background: url(../images/youhuijuan_03.png) 0 0 no-repeat;
+	background-size: 100% 100%;
+	color: #fff;
+	text-align: center;
+}
+.voucher_list_f .ri_pic div:first-child{
+	font-size: 2rem;
+	line-height: 1.8;
+}
+.voucher_list_f .ri_pic div:last-child{
+	font-size: 1.2rem;
+}
+.voucher_list ul li{
+    padding-top: 5%;
+	border-bottom: 0.4rem solid #dadada;
+	background-color: #fff;
+}
+/* body灰色背景 */
+.gray_back{
+	background-color: #dadada;
+}
+/* 我的积分 */
+.integral_top{
+	background: url(../images/jifenbeijing_02.png) 0 0 no-repeat;
+	background-size: 100%;
+	padding: 30%;
+	padding-bottom: 20%;
+	text-align: center;
+	color: #f4c963;
+	font-weight: bold;
+ 	font-size: 2.5rem;
+   line-height: 1.2;
+}
+.integral_mid{
+	width: 55%;
+	margin: 0 auto;
+	text-align: center;
+	background-color: #d72d22;
+	color: #fff;
+	padding: 2%;
+	border-radius: 1.3rem;
+}
+.prompt{
+	margin-top: 8%;
+}
+.prompt li{
+	border-top: 2px solid #dadada;
+	padding: 5%;
+}
+.prompt li h3{
+	font-weight: bold;
+}
+.prompt li p{
+	line-height: 2;
+}
+/* 设置 */
+.set_list{
+	background: #fff;
+}
+.touxiang{
+	overflow: hidden;
+}
+.photo_wrap{
+	 margin: 0 6%;
+	 border-bottom: 1px solid #dadada;
+	 
+}
+.set_list ul .set_list_li{
+	height: 5rem;
+	line-height: 5rem;
+    background: url(../img/marks.png) 0 center no-repeat;
+    background-size: 15%;
+}
+.photo_wrap:after{
+	content: '';
+	clear:both;
+	display: block;
+}
+.set_list li .set_list_le{
+	float: left;
+	margin-left: 4rem;
+}
+.set_list li .set_list_ri{
+	float: right;
+}
+.set_list{
+	font-weight: 700;
+}
+.am-selected{
+	background-color: transparent !important;
+}
+.up_pic_photo input{
+	width: 0px;
+	height: 0px;
+	outline: none !important;
+}
+.up_pic_photo{
+	width: 4.5rem;
+	height: 4.5rem;
+	border-radius: 50%;
+	background-color: #dadada;
+	margin-top: .3rem;
+}
+.up_pic_photo div{
+	width: 100%;
+	height: 100%;
+	
+}
+.up_pic_photo img{
+	vertical-align: top;
+	width: 100%;
+	height: 100%;
+	border-radius: 50%;
+}
+.preservation{
+	color: #fff;
+	background: none;
+	font-size: 1.6rem !important;
+
+}
+.set_list_li input.set_list_ri{
+	text-align: right;
+	border: none;
+	height: 3rem;
+	margin: 1rem 0;
+}
+.am-selected{
+	width: 100% !important;
+	float: right;
+}
+.like_cuisine{
+	width: 60%;
+	
+}
+.am-ucheck-icons{
+	font-size: 1.8rem;
+}
+.am-ucheck-icons{
+	line-height: 1.5;
+}
+.copyright{
+	text-align: center;
+	margin-top: 58%;
+}
+.copyright>div{
+	font-weight: 600;
+	margin-bottom: 1rem;
+}
+.copyright span{
+	font-size: 1.2rem;
+}
+.argee_mid_title h3 ,.argee_mid_title p{
+	font-weight:600; 
+	margin-bottom: 3%;
+}
+.argee_mid_title h3{
+	position: relative;
+}
+.argee_mid_title h3 img{
+	position: absolute;
+	top: -20%;
+	left: -8%;
+	width: 7%;
+}
+.argee_mid_info {
+	padding-left: 15%;
+}
+/* banner1 3 */
+.banner_pic img{
+	width: 100%;
+}
+.brief_info{
+	font-weight: 600;
+}
+
+.brief_info ul{
+	margin: 0 5%;
+   padding: 5% 0;
+ 	padding-left: 18%;
+   border-bottom: 2px solid #dadada;
+   position: relative;
+}
+.give ul{
+	border:none;
+}
+.brief_info ul span{
+	position: absolute;
+	left: 0;
+}
+.brief_info ul li ,.brief_info ul p{
+	list-style: outside;
+	line-height: 1.5;
+	font-size: 1.3rem;
+}
+.register_btn{
+	text-align: center;
+	margin-top: 10%;
+}
+.register_btn a{
+	padding: 1% 3%;
+	font-size: 1.4rem;
+	color: #fff;
+	background-color: #d72d22;
+	border-radius: 15px;
+}
+.integralreward div ul li:nth-child(2){
+	margin-top: 0;
+}
+.integralreward div ul li{
+	margin-top: 7%;
+}

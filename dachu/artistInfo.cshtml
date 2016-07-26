@@ -1,0 +1,180 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/layout.css">
+    <script src="/Content/js/jquery.min.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var ids = GetQuery("id");
+        $(function () {
+           
+            var dinner = "";
+            var dinners;
+            if ($.cookie("Dinner") != null) {
+                dinner = $.cookie("Dinner");
+                dinners = eval('(' + dinner + ')');
+            }
+            $.each(dinners, function (j) {
+                if (ids == dinners[j].FoodId) {
+                    $("#numbers").val(dinners[j].Number)
+                }
+            })
+            Dinner()//加载伴餐详细数据
+            DinnerBanner() //加载伴餐Banner
+        })
+        //加载伴餐详细数据
+        function Dinner()
+        {
+            var str = "";
+            var Specialty = "";
+            var qumu = "";
+            AjaxJson("/CommonModule/Q_Dinner/getDinnerById", { id: ids }, function (data) {
+                $.each(data, function (i) {
+                    $("#name").html(data[i].title + "艺术家");
+                    for (var j = 0; j < data[i].recommend; j++) {
+                        str += "<i class='am-icon-heart'></i>";
+                    }
+                    $("#tuijian").html(str);
+                    $("#number").html(data[i].sales);
+                    $("#prie").html(data[i].sprice);
+                    $("#prie1").html(data[i].sprice);
+                    Specialty = data[i].specialty;
+                    var strs = new Array();
+                    strs = Specialty.split("，")
+                    for (var k = 0; k < strs.length; k++) {
+                        qumu += "<p class='pageP zhu'>" + strs[k] + "</p>";
+                    }
+                    $("#qumu").html(qumu);
+                    $("#dinnerid").val(data[i].id)
+                })
+            })
+        }
+
+        //加载伴餐Banner
+        function DinnerBanner()
+        {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Banner/getImg", {address:3}, function (data) {
+                $.each(data, function (i) {
+                    str += "<li><a><img src='"+data[i].img+"' class='am-img-responsive card' alt=\"<?=$val['name']?>\"></a></li>";
+                })
+                $("#banner").html(str);
+            })
+        }
+        function hrefOrder() {
+            window.location.href = "cart";
+        }
+    </script>
+</head>
+<body class="bwhite bpa">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            伴餐
+        </h1>
+    </header>
+
+    <form action="" method="post" enctype="mutiltype/data">
+        <!-- banner -->
+        <div data-am-widget="slider" class="am-slider am-slider-default" data-am-slider='{}'>
+            <ul class="am-slides" id="banner">
+            </ul>
+        </div>
+
+        <div class="pageDiv bwhite">
+            <h2 id="name"></h2>
+            <p class="pageP red">
+                <span>推荐指数</span><span id="tuijian" style="width:70px"></span>
+                <br>
+                <span>总销</span> <b id="number"></b>份
+            </p>
+            <div class="youNum red">
+                <span id="prie"></span>元/每次演出
+                <br>
+                <span class="am-hide price" id="prie1"></span>
+                <div class="fNum artNum">
+                    <span class="reduce am-icon-minus-square" onclick="dinnerhandle(this, false)"></span>
+                    <input id="numbers" type="text" class="numTxt" name="numbers[]" onkeydown="keydown(this)" onkeypress="    return IsNum(event)" oninput="    dinnerueserWrite(this, ids)" value="0" readonly>
+                    <span class="add am-icon-plus-square" onclick="dinnerhandle(this, true)"></span>
+                </div>
+            </div>
+            <p class="pageP zhu">
+                注：为了给您提供更好的服务，伴餐艺术家需要提前48小时预约，每次演出时间时常60分钟。
+            </p>
+        </div>
+
+        <hr class="am-article-divider serviceHr">
+
+        <div class="pageDiv bwhite">
+            <h2>擅长曲目</h2>
+            <span id="qumu"></span>
+        </div>
+        <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft" style="bottom:51px;" id="">
+            <div class="am-u-sm-9 a">
+                <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA">0</span></span>
+                <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0</span>
+                
+            </div>
+            <div class="am-u-sm-3 b">
+                <button type='button' onclick=" hrefOrder()" class="am-btn">去结算</button>
+            </div>
+        </div>
+    </form>
+    <input id="dinnerid" type="hidden" />
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart" class="active">
+                    <span class=""><img src="/Content/img/cart2.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal/personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    
+    <script src="/Content/js/amazeui.min.js"></script>
+    <script src="/Content/js/Dinnernum_num.js"></script>
+</body>
+
+</html>

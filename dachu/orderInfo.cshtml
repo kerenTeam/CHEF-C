@@ -1,0 +1,317 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/common.css" />
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var id = GetQuery("id");
+        var hrefid = id;
+        $(function () {
+            getOrderInfo()
+        })
+
+        function getOrderInfo() {
+            var shuliangs = 0;
+            var orderall = "<li class='am-g am-list-item-dated'><div class='orderProcess'><div class='proImg am-posR'></div><!-- 说明： am-icon-circle-o red 流程已进行am-icon-circle red 流程进行中 am-icon-circle-o gray 流程未进行 --><div class='process'><span class='am-icon-circle-o gray'></span><div>未付款</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div>待分配</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div>待接单</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div>待出库</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div class='posleft'>已出发</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div>服务中</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div>待评价</div></div><div class='process'><span class='am-icon-circle-o gray'></span><div>完成</div></div><div class='process bwhite'> </div> </div></li><li class='am-g am-list-item-dated am-padding am-text-lg black'><div>联系人：&nbsp;&nbsp;&nbsp;&nbsp;<span id='name'></span></div><div>联系电话：<span id='phone'></span></div><div>服务时间：<span id='yuyue'></span></div><div>服务地点：<span id='address'></span></div></li>";
+            $("#orderall").html(orderall);
+            AjaxJson("/CommonModule/Q_POOrder/getStateInfo", { orderid: id }, function (data) {
+                $.each(data, function (i) {
+                    $("#billno").html('订单号 ' + data[i].billno);
+                    if (data[i].state == 0) {
+                        $('.process span').eq(0).removeClass().addClass('am-icon-circle red');
+                        $('.stateButotn .payButton').css('display', 'block')
+                    }
+                    if (data[i].state == 1 || data[i].state == 7) {
+                        if (data[i].cookid == "") {
+                            $('.process span').eq(0).removeClass().addClass('am-icon-circle-o red');
+                            $('.process span').eq(1).removeClass().addClass('am-icon-circle red');
+                            $('.stateButotn .tuiButton').css('display', 'block')
+                        }
+                    }
+                    if (data[i].state == 2 || data[i].state == 7) {
+                        if (data[i].cookid != "") {
+                            $('.process').eq(2).prevAll().find('span').removeClass().addClass('am-icon-circle-o red');
+                            $('.process span').eq(2).removeClass().addClass('am-icon-circle red');
+                            $('.stateButotn .tuiButton').css('display', 'block')
+                        }
+                    }
+                    if (data[i].state == 7) {
+                        $('.stateButotn .tuiButton').css('display', 'none');
+                        $('.stateButotn .backButton').css('display', 'block');
+
+                    }
+                    if (data[i].state == 6) {
+                        $('.process').eq(3).prevAll().find('span').removeClass().addClass('am-icon-circle-o red');
+                        $('.process span').eq(3).removeClass().addClass('am-icon-circle red');
+                        $('.stateButotn .tuiButton').css('display', 'block')
+                    }
+                    if (data[i].state == 4) {
+                        $('.process').eq(4).prevAll().find('span').removeClass().addClass('am-icon-circle-o red');
+                        $('.process span').eq(4).removeClass().addClass('am-icon-circle red');
+                        $('.stateButotn .serButton').css('display', 'block')
+                    }
+                    if (data[i].state == 3) {
+                        $('.process').eq(5).prevAll().find('span').removeClass().addClass('am-icon-circle-o red');
+                        $('.process span').eq(5).removeClass().addClass('am-icon-circle red');
+                        $('.stateButotn .outButton').css('display', 'block')
+                    }
+                    if (data[i].state == 8) {
+                        $('.process').eq(6).prevAll().find('span').removeClass().addClass('am-icon-circle-o red');
+                        $('.process span').eq(6).removeClass().addClass('am-icon-circle red');
+                        $('.stateButotn .comtButton').css('display', 'block')
+                    }
+                    var waiternumbers = 0;
+                    var fuwunumbers = 0;
+                    if (parseFloat(data[i].manwaiter) + parseFloat(data[i].wumenwaiter) > 0) {
+                        fuwunumbers = parseFloat(data[i].manwaiter) + parseFloat(data[i].wumenwaiter);
+                        getAjax("/CommonModule/Q_SingleFoodEvaluate/getWaiterEvaluates", { orderid: data[i].poorderid }, function (waiternumber) {
+                            waiternumbers = waiternumber;
+                        })
+                    }
+                    var orderlist = "";
+                    var couponmoney = 0;
+                    pinglunnumber = 0;
+                    AjaxJson("/CommonModule/Q_MemberAddress/getInfoById", { id: data[i].menberaddressid }, function (addressInfo) {
+                        $.each(addressInfo, function (q) {
+                            $("#name").html(addressInfo[q].name)
+                            $("#phone").html(addressInfo[q].goodsphone)
+                            $("#yuyue").html(new Date(data[i].appointmenttime).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, ''))
+                            $("#address").html(addressInfo[q].address)
+                        })
+                    })
+
+                    AjaxJson("/CommonModule/Q_POOrderEntry/getAllByOrderId", { poorderid: data[i].poorderid }, function (entry) {
+                        $.each(entry, function (j) {
+                            if (entry[j].foodnumber != null) {
+                                orderlist += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>" + entry[j].foodname + " <span class='am-fr am-margin-right-lg'>X " + entry[j].foodnumber + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>" + entry[j].foodmoney + " </span></li> ";
+                            }
+                            if (entry[j].state == 1) {
+                                $('.share_right a').html('已评价');
+                                $('.share_right a').unbind('click');
+                            }
+                            else {
+                                pinglunnumber++;
+                            }
+                        })
+                    })
+                    if (data[i].sprice!=undefined) {
+                        orderlist += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>" + data[i].title + "艺术家 <span class='am-fr am-margin-right-lg'>X 1</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>" + data[i].sprice + " </span></li> ";
+                    }
+
+                    AjaxJson("/CommonModule/Q_CelebrationEntry/getCele", { orderid: data[i].poorderid }, function (celedata) {
+                        $.each(celedata, function (q) {
+                            orderlist += "<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '>" + celedata[q].name + " <span class='am-fr am-margin-right-lg'>X " + celedata[q].detailsnumber + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i>" + celedata[q].price + " </span></li> ";
+                        })
+                    })
+
+                   
+                    if (data[i].state == 9) {
+                        if (fuwunumbers == 0 && pinglunnumber == 0) {
+                            $('.process span').removeClass().addClass('am-icon-circle-o red');
+                            $('.stateButotn .overButton').css('display', 'block')
+                        }
+                        else if (fuwunumbers != 0 && pinglunnumber == 0 && waiternumbers == 1) {
+                            $('.process span').removeClass().addClass('am-icon-circle-o red');
+                            $('.stateButotn .overButton').css('display', 'block')
+                        }
+                        else {
+                            $('.process span').removeClass().addClass('am-icon-circle-o red');
+                            $('.stateButotn .recomtButton').css('display', 'block')
+                        }
+
+                    }
+                    $("#orderall").append(orderlist);
+                    if (data[i].manwaiter != 0) {
+                        $("#orderall").append("<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '> 男服务员 <span class='am-fr am-margin-right-lg'>X " + data[i].manwaiter + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i> 80</span></li> ");
+                    }
+                    if (data[i].wumenwaiter != 0) {
+                        $("#orderall").append("<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '> 女服务员 <span class='am-fr am-margin-right-lg'>X " + data[i].wumenwaiter + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i> 80</span></li> ");
+                    }
+                    if (data[i].canju != 0) {
+                        $("#orderall").append("<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '> 餐具 <span class='am-fr am-margin-right-lg'>X " + data[i].canju + "</span></a><span class='am-list-date ath'><i class='am-icon-cny'></i> 80</span></li> ");
+                    }
+                    if (data[i].gooutfee != 0) {
+                        $("#orderall").append("<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd '> 服务费 <span class='am-fr gray'></span></a><span class='am-list-date ath'><i class='am-icon-cny'></i> " + data[i].gooutfee + "</span></li> ");
+                    }
+                    var integral = 0;
+                    if (data[i].integral == 0) {
+                        integral = 0
+                    }
+                    else {
+                        integral = parseFloat(data[i].integral) / 100;
+                    }
+                    if (data[i].coupponmoney == null) {
+                        data[i].coupponmoney = 0;
+                    }
+                    $("#orderall").append("<li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd red'> 积分减免</a><span class='am-list-date red ath'>- <i class='am-icon-cny'></i>" + integral + "</span></li><li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd red'> 抵用券减免</a><span class='am-list-date red ath'>- <i class='am-icon-cny'></i>" + data[i].coupponmoney + "</span></li> <li class='am-g am-list-item-dated'><a href='javascript:' class='am-list-item-hd red'>订单总计:</a><span class='am-list-date ath'><i class='am-icon-cny red' id='money'>" + data[i].amount + "</i></span></li><li class='am-g am-list-item-dated'> </li>");
+                    if (data[i].coupon != "") {
+                        AjaxJson("/CommonModule/Q_Coupon/getCouponById", { id: data[i].coupon }, function (coupon) {
+                            $.each(coupon, function (q) {
+
+                            })
+                        })
+                    }
+                })
+            })
+        }
+
+        function hrefPay(id) {
+            window.location.href = "pay?orderid=" + id;
+        }
+
+        function reload() {
+            window.location.reload();
+        }
+        function hrefCommend() {
+            window.location.href = "totalComment?orderid=" + id;
+        }
+    </script>
+</head>
+<body class="pabo">
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="orderManage">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            订单详情
+        </h1>
+    </header>
+    <div class="am-list-news-bd bwhite">
+        <p class="am-padding-vertical-sm orderTit"><img src="/Content/img/marks.png" class="marks" alt=""><span>我的订单</span><small id="billno" class="am-fr am-margin-right-sm gray"></small></p>
+        <ul class="am-list odl" id="orderall"></ul>
+        <div class="am-cf stateButotn">
+            <!-- 待付款 -->
+            <a onclick="hrefPay(hrefid)" class="payButton"><button type="button" class="am-btn am-fr am-round bred am-btn-sm am-margin-sm">付款</button></a>
+            <!-- 待接单 -->
+
+            <button type="button" class="am-btn am-fr am-round am-btn-sm bwhite red am-margin-sm brred tuiButton" onclick="sure(this)">退单</button>
+            <!-- 退款中 -->
+            <button type="button" class="am-btn am-fr am-round am-btn-sm bwhite red am-margin-sm brred backButton">退款中</button>
+            <!-- 服务中 -->
+            <button type="button" class="am-btn am-fr am-round am-btn-sm bwhite red am-margin-sm brred outButton">服务中</button>
+            <!-- 已完成 -->
+            <button type="button" class="am-btn am-fr am-round am-btn-sm bwhite red am-margin-sm brred overButton">已完成</button>
+            <!-- 待服务 -->
+            <button type="button" class="am-btn am-fr am-round am-btn-sm bwhite red am-margin-sm brred serButton">待服务</button>
+            <!-- 待评价 -->
+            <a onclick=" hrefCommend()" class="comtButton"><button type="button" class="am-btn am-fr am-round bred am-btn-sm am-margin-sm">评价</button></a>
+            <!-- 继续评价 -->
+            <a onclick=" hrefCommend()" class="recomtButton"><button type="button" class="am-btn am-fr am-round bred am-btn-sm am-margin-sm">继续评价</button></a>
+        </div>
+    </div>
+
+    <!-- 退款提示弹框 -->
+
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">您确定要退单吗？</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                <button type='button' class="bno beee whtie closem">取消</button>
+                <button type='button' id="sub" class="bno bred white closem">确定</button>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- model -->
+    <div class="am-modal am-modal-no-btn" tabindex="-1" id="my-alert">
+        <div class="am-modal-dialog am-radius popBg">
+
+            <div class="am-modal-bd am-margin-top-sm customBtn">
+                <h2 class="white">退款申请已提交</h2>
+                <p class="white am-margin">
+                    很高兴为您服务
+                    <br>我会通过8432778与您取得联系。
+                </p>
+
+                <a onclick="reload()" class="btn am-btn am-btn-sm am-btn-danger am-radius white" data-am-modal-close>好</a>
+            </div>
+        </div>
+    </div>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">联系客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal" class="active">
+                    <span class=""><img src="/Content/img/gr2.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+</body>
+<script src="/Content/js/amazeui.min.js"></script>
+<script>
+    function sure(obj) {
+        $('.tk').fadeIn('fast');
+        $('.tk').find(".content").html(obj);
+        $('.closem').click(function () {
+            $('.tk').fadeOut('fast');
+        });
+        $('#sub').click(function () {
+            $('.tk').fadeOut('fast');
+
+            getAjax("/CommonModule/Q_POOrder/refundApply", { orderid: id }, function (data) {
+                if (data == 1) {
+                    $('#my-alert').modal('open');
+
+                    $('.stateButotn .tuiButton').css('display', 'none');
+                    $('.stateButotn .backButton').css('display', 'block');
+                }
+                else if (data == 0) {
+                    alert("退款申请失败，请重试");
+                }
+                else {
+                    alert(data);
+                }
+
+            })
+        });
+
+
+    }
+</script>
+</html>

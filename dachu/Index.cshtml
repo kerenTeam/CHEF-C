@@ -1,0 +1,333 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link href="~/Content/css/amazeui.min.css" rel="stylesheet" />
+    <link href="~/Content/css/app.css" rel="stylesheet" />
+   
+    <script src="~/Content/Scripts/jquery/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/Scripts/cookie/jquery.cookie.js"></script>
+    <script>
+        
+        $(function () {
+            //openid()
+            getBannerImg();//获取banner图
+            Boutique(); //加载精品生活
+        })
+        //获取openid
+        function openid() {
+            var openid = "";
+            getAjax("/commonmodule/WeiXinOpenId/openid", {}, function (data) {
+                openid = data;
+            })
+            if (openid == "") {
+                $code = GetQuery("code");
+                if ($code == "" || $code == null) {
+                    getAjax("/commonmodule/WeiXinOpenId/GetAuthorizeUrl", { redirectUrl: "http://www.krfer.com/dachu/Index" }, function (res) {
+                        window.location.replace(res);
+                    })
+                } else {
+                    getAjax("/commonmodule/WeiXinOpenId/GetOpenId", { code: $code }, function (dataopenid) {
+                        getAjax("/commonmodule/WeiXinOpenId/addopenid", { openid: dataopenid }, function (d) {
+                        })
+                        //传入openid获取是否绑定
+                        AjaxJson("/CommonModule/Q_Users/isOpenId", { openid: dataopenid }, function (data) {
+                            if (data == 0) {
+                                alert("请绑定手机号")
+                                window.location.href = "register";
+                            }
+                            else {
+                                AjaxJson("/CommonModule/Q_Users/SessionPhoneByOpenid", { openid: dataopenid }, function (data) {
+
+                                })
+                            }
+                        })
+                    })
+                }
+            }
+            else {
+                AjaxJson("/CommonModule/Q_Users/SessionPhoneByOpenid", { openid: openid }, function (data) {
+
+                })
+            }
+        }
+
+        //获取banner图
+        function getBannerImg() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Banner/getImg", { address: 1 }, function (data) {
+                $.each(data, function (i) {
+                    str += "<li><a href='"+data[i].url+"'><img src='" + data[i].img + "' class='am-img-responsive card' alt=\"<?=$val['name']?>\"></a></li>";
+                })
+                $("#bannerimg").html(str);
+            })
+        }
+
+        //加载精品生活
+        function Boutique() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Boutique/getBoutique", { start: 1, end: 1 }, function (data) {
+                $.each(data, function (i) {
+                    var tuijianxiang = "";
+                    for (var j = 0; j < data[i].recommend; j++) {
+                        tuijianxiang+= "<img src='/Content/img/introHeart.png' class='am-vertical-align-middle introheart'>";
+                    }
+                    str += "<figure onclick='hrefBoutique(\"" + data[i].boutiqueid + "\")'><a><img src='" + data[i].backgoungimg + "' alt=''><figcaption class='am-cf am-vertical-align'><div class='am-fl leftRe'><img src='/Content/img/User.jpg' class='am-circle chefPic' alt=''><span class='am-vertical-align-middle am-margin-left red'>" + data[i].name + "</span></div><div class='am-fr am-margin-right'><span class='am-vertical-align-middle am-margin-right-xs am-text-xs red'>推荐指数" + tuijianxiang + "</span></a></div></figcaption></figure>";
+                })
+                $("#boutique").html(str);
+            })
+        }
+        //跳转精品生活详情
+        function hrefBoutique(id) {
+            window.location.href = "life?id=" + id;
+        }
+
+        //跳转点菜页面
+        function hrefFood(id)
+        {
+            window.location.href = "cookBook?id="+id;
+        }
+    </script>
+
+</head>
+<style type="text/css">
+    .per {
+        padding: 20px;
+        border-bottom: 1px dotted #d3d3d3;
+    }
+
+    .title {
+        font-weight: bold;
+        color: #39f;
+    }
+
+    .nodata {
+        display: none;
+        height: 32px;
+        line-height: 32px;
+        text-align: center;
+        color: #999;
+        font-size: 14px;
+    }
+
+        .nodata img {
+            width: 25px;
+        }
+
+    h2.tip {
+        margin: 20px;
+        font-size: 18px;
+    }
+</style>
+
+<body>
+    <!-- 搜索 -->
+    <div class="am-g searchFix">
+        <img class="search" src="/Content/img/search.png" alt="">
+        <input type="text" class="am-form-field am-text-right red" name='search' placeholder="请输入食材或菜品">
+    </div>
+    <!-- banner -->
+    <div data-am-widget="slider" class="am-slider am-slider-default" data-am-slider='{}'>
+        <ul class="am-slides" id="bannerimg"></ul>
+    </div>
+    <!-- 菜品 -->
+    <div class=" am-shadow veg2">
+        <div class="am-g doc-am-g">
+            <div class="am-u-sm-5">
+                <a onclick="hrefFood('3a511539-fb3f-401f-afaa-d204bfc678b4')">
+                    <img src="/Content/img/a1.png" alt="">
+                    <div class="gallery-item tbg tl">
+                        <span class="am-gallery-title">点菜</span>
+                        <img src="/Content/img/dc.png" alt="办酒碗" />
+                    </div>
+                </a>
+            </div>
+            <div class="am-u-sm-5">
+                <a onclick="hrefFood('fe7ad9a9-1bec-4929-b160-85f9a784f527')">
+                    <img src="/Content/img/a2.png" alt="">
+                    <div class="gallery-item tbg tr">
+                        <img src="/Content/img/tc.png" alt="办酒碗" />
+                        <span class="am-gallery-title">套餐</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <div class="am-g doc-am-g">
+            <div class="am-u-sm-5">
+                <a href="party">
+                    <img src="/Content/img/a3.png" alt="">
+                    <div class="gallery-item tbg tl">
+                        <span class="am-gallery-title">宴席</span>
+                        <img src="/Content/img/yx.png" alt="办酒碗" />
+                    </div>
+                </a>
+            </div>
+            <div class="am-u-sm-5">
+                <a onclick="hrefFood('e8e35fd9-ece8-4b21-bec2-378a837e7bbd')">
+                    <img src="/Content/img/a4.png" alt="">
+                    <div class="gallery-item tbg tr">
+                        <img src="/Content/img/js.png" alt="办酒碗" />
+                        <span class="am-gallery-title">酒水</span>
+                    </div>
+                </a>
+            </div>
+        </div>
+        <img src="/Content/img/flower.png" class="flower" alt="">
+    </div>
+    <!-- 热销 -->
+    <div class="am-g am-shadow hot">
+        <p class="htit red">特色服务</p>
+        <div class="am-cf serpad">
+            <div class="am-u-sm-3">
+                <a href="waiter">
+                    <img src="/Content/img/serv.png" />
+                    <p class="red">服务</p>
+                </a>
+            </div>
+            <div class="am-u-sm-3">
+                <a href="artist">
+                    <img src="/Content/img/ban.png" />
+                    <p class="red">伴餐</p>
+                </a>
+            </div>
+            <div class="am-u-sm-3">
+                <a href="pageant">
+                    <img src="/Content/img/cerem.png" />
+                    <p class="red">庆典</p>
+                </a>
+            </div>
+            <div class="am-u-sm-3">
+                <a href="price">
+                    <img src="/Content/img/vegePr.png" />
+                    <p class="red">菜价</p>
+                </a>
+            </div>
+        </div>
+        </div>
+    <div class="am-g am-margin-top-xs">
+        <p class="htit bwhite red">精品生活</p>
+    </div>
+    <div class="bda">
+        <div class="am-g Life" id="boutique">
+
+        </div>
+    </div>
+    <!-- 图文加载 -->
+    <div class="container bda">
+        <div class="am-g Life">
+            <div class="demo">
+                <div id="lists">
+                </div>
+                <div class="nodata"></div>
+            </div>
+        </div>
+    </div>
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index" class="active">
+                    <span class="">
+                        <img src="/Content/img/home2.png" alt="">
+                    </span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">
+                        购物车
+                    </span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <script src="/Content/js/jquery.min.js"></script>
+    <script src="/Content/js/amazeui.min.js"></script>
+
+    <script type="text/javascript">
+        var i = 1;
+        $(function () {
+
+            //搜索跳转
+            $('.searchFix input').focus(function () {
+                window.location.href = "search";
+            });
+
+            //加载
+            var totalpage = 6; //总页数，防止超过总页数继续滚动
+            var winH = $(window).height(); //页面可视区域高度
+            $(window).scroll(function () {
+                if (i < totalpage) { // 当滚动的页数小于总页数的时候，继续加载
+                    var pageH = $(document.body).height();
+                    var scrollT = $(window).scrollTop(); //滚动条top
+                    var aa = (pageH - winH - scrollT) / winH;
+                    if (aa < 0.01) {
+                        getJson(i); //加载第一页
+                    }
+                }
+            })
+        });
+
+        function getJson(page) {
+            i++;
+            $(".nodata").show().html("<div class='am-text-sm am-center'><i class='am-icon-spinner am-icon-spin'></i></div>");
+            AjaxJson("/CommonModule/Q_Boutique/getBoutique", {
+                start: 1, end: i
+            }, function (json) {
+                if (json) {
+                    var str = "";
+                    $.each(json, function (i) {
+                        var tuijianxing = "";
+                        for (var k = 0; k < json[i].recommend; k++) {
+                            tuijianxing += "<img src='/Content/img/introHeart.png' class='am-vertical-align-middle introheart'>";
+                        }
+                        var str = "<figure onclick='hrefBoutique(\"" + json[i].boutiqueid + "\")'> <a><img src='" + json[i].backgoungimg + "'><figcaption class='am-cf am-vertical-align'><div class='am-fl leftRe'><img src='/Content/img/User.jpg' class='am-circle chefPic'><span class='am-vertical-align-middle am-margin-left red'>" + json[i].name + "</span> </div><div class='am-fr am-margin-right'><span class='am-vertical-align-middle am-margin-right-xs am-text-xs red'>推荐指数" + tuijianxing + "</span></div></figcaption></a></figure>";
+                        $("#lists").html(str);
+                    });
+                    setTimeout(function () {
+                        $(".nodata").hide();
+                    }, 50000);
+                } else {
+                    showEmpty();
+                }
+            });
+        }
+
+        function showEmpty() {
+            setTimeout(function () {
+                $(".nodata").show().html("别滚动了，已经到底了。。。");
+            },
+                10000);
+        }
+    </script>
+</body>
+
+</html>

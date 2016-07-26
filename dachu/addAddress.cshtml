@@ -1,0 +1,323 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>新增地址</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/app.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <link href="/Content/css/personal.css" rel="stylesheet">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        var state = GetQuery("state");
+        var phone = "";
+        $(function () {
+            getphone()//获取电话
+            if ($.cookie("AddressName")!=null) {
+                $("#name").val($.cookie("AddressName"))
+            }
+            if ($.cookie("AddressPhone") != null) {
+                $("#phone").val($.cookie("AddressPhone"))
+            }
+        })
+        //获取电话
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                    $("#phone").val(phone)
+                }
+            })
+        }
+        //新增地址
+        function address() {
+            var address = "";
+            var address1 = "";
+            var reg = /^1((3|4|5|8|7){1}\d{1}|70)\d{8}$/;
+                address = $("#Address").val()
+                address1 = $("#mapAddress").html()
+                address = address1 + address;
+            if ($('.youname').val() == '') {
+                $('.red')[0].innerHTML = '请输入您的名字!'
+                $('.tk')[0].style.display = 'block';
+                return false;
+            } else if ($('#phone').val() == '' || !reg.test($('#phone').val())) {
+                $('.red')[0].innerHTML = '请输入正确的手机号!'
+                $('.tk')[0].style.display = 'block';
+                return false;
+            } else if ($('.detailed_address').val() == '') {
+                $('.red')[0].innerHTML = '请输入详细地址!'
+                $('.tk')[0].style.display = 'block';
+                return false;
+            } else {
+                getAjax("/CommonModule/Q_MemberAddress/addMemberAddress", { UserPhone: phone, Name: $("#name").val(), Gender: $('input:radio:checked').val(), GoodsPhone: $("#phone").val(), Address: address }, function (data) {
+                    if (data == 1) {
+                        //alert("新增成功")
+                        if (state == "") {
+                            $.cookie("AddressName",null);
+                            $.cookie("AddressPhone", null)
+                            window.location.href = "address";
+                        }
+                        else {
+                            $.cookie("AddressName", null);
+                            $.cookie("AddressPhone", null)
+                            window.location.href = "address?state=1";
+                        }
+                        
+                    }
+                    else {
+                        alert("新增失败")
+                    }
+                })
+            }
+         
+        }
+
+        function AddressCookie() {
+            $.cookie("AddressName", $("#name").val());
+            $.cookie("AddressPhone", $("#phone").val())
+        }
+
+    </script>
+</head>
+<body class="paddfoot">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            选择地址
+        </h1>
+    </header>
+    <form class="add_wrap">
+        <div class="add_list">
+            <span>联系人</span>
+            <input type="text" onkeyup="AddressCookie()" id="name" name="" placeholder="您的姓名" class="youname" />
+        </div>
+        <div class="checke_list">
+            <label class="am-radio am-secondary am-danger">
+                <input type="radio" name="radio3" value="1" data-am-ucheck checked> 先生
+            </label>
+            <label class="am-radio am-secondary am-danger">
+                <input type="radio" name="radio3" value="0" data-am-ucheck> 女士
+            </label>
+        </div>
+        <div class="add_list add_phone">
+            <span>联系电话</span>
+            <input type="text" name="" onkeyup="AddressCookie()" placeholder="您的手机号" id="phone" value="" />
+            @*<a href="javascript:;" title="">
+                <img src="/Content/images/jaidizhi-_03.png" alt="">
+            </a>*@
+        </div>
+        <div class="add_list">
+            <span>收货地址</span>
+            <a href="mMap?keywords=写字楼,学校,小区&key=8f29aefac8547821425571df8852f64b" id="mapAddress">
+                <b id="address1" class="gray">小区 / 写字楼 / 学校等（点击定位）</b>
+                @*<input type="text" id="address1" name="ADR" placeholder="小区 / 写字楼 / 学校等" readonly />*@
+            </a>
+        </div>
+        <div class="add_list " style="padding-top: 10%">
+            <span style="color: transparent;">收货地址</span><!-- 占位子 -->
+            <input type="text" id="Address" name="" placeholder="详细地址（如门牌号等）" class="detailed_address" />
+        </div>
+        <div class="add_f_btn">
+            <!-- 添加地址成功跳转address.html -->
+            <input type="button" onclick="address()" name="" class="redbtn" value="确定" />
+        </div>
+
+    </form>
+    <!-- 提示框 -->
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">您确定要删除吗？</div>
+                </div>
+            </div>
+            <div class="btnGp">
+              @*  <button type='button' class="bno beee whtie closem cancel">取消</button>*@
+                <button type='button' id="sub" class="bno bred white closem yes">确定</button>
+            </div>
+        </div>
+    </div>
+    <!-- 提示框结束 -->
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div id="tip"></div>
+    <div id="result"></div>
+    <script src="/Content/js/amazeui.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=8f29aefac8547821425571df8852f64b"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=8f29aefac8547821425571df8852f64b&plugin=AMap.Geocoder"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script type="text/javascript">
+        var map, geolocation;
+        function map() {
+
+
+
+            //加载地图，调用浏览器定位服务
+            map = new AMap.Map('', {
+                resizeEnable: true
+            });
+            map.plugin('AMap.Geolocation', function () {
+                geolocation = new AMap.Geolocation({
+                    enableHighAccuracy: true,//是否使用高精度定位，默认:true
+                    timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+                    buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+                    zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+                    buttonPosition: 'RB'
+                });
+                map.addControl(geolocation);
+                geolocation.getCurrentPosition();
+                AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+                AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
+            });
+            //解析定位结果
+            function onComplete(data) {
+                var str = ['定位成功'];
+                str.push('经度：' + data.position.getLng());
+                str.push('纬度：' + data.position.getLat());
+                str.push('精度：' + data.accuracy + ' 米');
+                str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+                // document.getElementById('tip').innerHTML = str.join('<br>');
+                var position = [data.position.getLng(), data.position.getLat()]
+                regeocoder(position)
+            }
+            //解析定位错误信息
+            function onError(data) {
+                $('#mapAddress').html('');
+            }
+
+
+            // lnglatXY = [116.396574, 39.992706]; //已知点坐标
+            function regeocoder(lnglatXY) {  //逆地理编码
+                var geocoder = new AMap.Geocoder({
+                    radius: 1000,
+                    extensions: "all"
+                });
+                geocoder.getAddress(lnglatXY, function (status, result) {
+                    if (status === 'complete' && result.info === 'OK') {
+                        geocoder_CallBack(result);
+                    }
+                });
+                var marker = new AMap.Marker({  //加点
+                    map: map,
+                    position: lnglatXY
+                });
+                map.setFitView();
+            }
+            function geocoder_CallBack(data) {
+                var address = data.regeocode.formattedAddress; //返回地址描述
+                // document.getElementById("result").innerHTML = address;
+                $('#mapAddress').html(address);
+            }
+        }
+    </script>
+    <script type="text/javascript">
+        (function () {
+            //var reg = /^1((3|4|5|8|7){1}\d{1}|70)\d{8}$/;
+            //$('form')[0].onsubmit = function () {
+            //    if ($('.youname').val() == '') {
+            //        $('.red')[0].innerHTML = '请输入您的名字!'
+            //        $('.tk')[0].style.display = 'block';
+            //        return false;
+            //    } else if ($('#phone').val() == '' || !reg.test($('#phone').val())) {
+            //        $('.red')[0].innerHTML = '请输入正确的手机号!'
+            //        $('.tk')[0].style.display = 'block';
+            //        return false;
+            //    } else if ($('.detailed_address').val() == '') {
+            //        $('.red')[0].innerHTML = '请输入详细地址!'
+            //        $('.tk')[0].style.display = 'block';
+            //        return false;
+            //    } else {
+            //        $('.red')[0].innerHTML = '添加地址成功!'
+            //        $('.tk')[0].style.display = 'block';
+            //    }
+            //}
+
+            //$('.cancel')[0].onclick = function () {
+            //    //javascript: history.go(-1);
+
+            //}
+
+            $('.yes')[0].onclick = function () {
+                $('.tk')[0].style.display = 'none';
+                if ($('.youname').val() == '') {
+                    $('.youname').focus();
+                } else if ($('#phone').val() == '' || !reg.test($('#phone').val())) {
+                    $('#phone').focus();
+                } else if ($('.detailed_address').val() == '') {
+                    $('.detailed_address').focus();
+                }
+            }
+            function GetRequest() {
+
+                var url = location.search; //获取url中"?"符后的字串
+                var theRequest = new Object();
+                if (url.indexOf("?") != -1) {
+                    var str = url.substr(1);
+                    strs = str.split("&");
+                    for (var i = 0; i < strs.length; i++) {
+                        theRequest[strs[i].split("=")[0]] = (strs[i].split("=")[1]);
+                    }
+                }
+                return theRequest;
+            }
+            console.log(decodeURI(GetRequest().name) + '------' + decodeURI(GetRequest().address));
+            if (decodeURI(GetRequest().address) === 'undefined') {
+                map();
+            } else {
+                $('#mapAddress').html(decodeURI(GetRequest().address));
+            }
+
+        })();
+
+
+
+    </script>
+</body>
+</html>

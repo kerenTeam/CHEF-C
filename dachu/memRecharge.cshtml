@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>办理会员卡</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/app.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <link href="/Content/css/personal.css" rel="stylesheet">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        var phone = "";
+        $(function () {
+            getphone()
+            getGrades()
+        })
+        function getphone() {
+            getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+                if (data == "0") {
+                    alert("请登录")
+                    window.location.href = "signin";
+                }
+                else {
+                    phone = data;
+                }
+            })
+        }
+
+        function getGrades() {
+            AjaxJson("/CommonModule/Q_Users/getGradelByPhone", { phone: phone }, function (data) {
+                $.each(data, function (i) {
+                    $("#money").html(data[i].balance)
+                })
+
+            })
+        }
+
+    </script>
+</head>
+<body class="paddfoot">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            会员卡充值
+        </h1>
+    </header>
+    <!-- header -->
+    <div class="balance">
+        <b>余额</b> <span>¥ <b id="money"></b></span>
+    </div>
+    <div class="faceValues">
+        <ul>
+            <li class="face_active">
+                <p>100元</p>
+                <span>赠送：20元</span>
+            </li>
+            <li>
+                <p>300元</p>
+                <span>赠送：60元</span>
+            </li>
+            <li>
+                <p>500元</p>
+                <span>赠送：100元</span>
+            </li>
+            <li>
+                <p>1000元</p>
+                <span>赠送：200元</span>
+            </li>
+            <li>
+                <p>3000元</p>
+                <span>赠送：600元</span>
+            </li>
+            <li>
+                <p>5000元</p>
+                <span>赠送：1000元</span>
+            </li>
+        </ul>
+        <p class="Promotion">充100送20，多充多送</p>
+    </div>
+    <input type="hidden" value="120" name="allMoney">
+    <a onclick="hrefPay()"><input type="submit" name="" value="立即充值（到账120元）" class="now_Recharge" /></a>
+
+
+    <div class="add_agreement">
+        点击立即充值，即表示您已同意
+        <a href="RechargeAgreement">《充值协议》</a>
+    </div>
+
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal">
+                    <span class=""><img src="/Content/img/gr1.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <!-- footer -->
+    <script type="text/javascript">
+        var recharge = 100;
+        var givemoney = 20;
+        (function () {
+            var faceli = document.getElementsByClassName('faceValues')[0].getElementsByTagName('li');
+            document.getElementsByClassName('now_Recharge')[0].value = '立即充值（到账120元）';
+            for (var i = 0; i < faceli.length; i++) {
+                faceli[i].i = i;
+
+                faceli[i].onclick = function () {
+                    // 当前点击索引
+                    var index = this.i;
+                    var moneylarge = parseFloat(faceli[index].getElementsByTagName('p')[0].innerHTML);
+                    var moneySmall = parseFloat((faceli[index].getElementsByTagName('span')[0].innerHTML).replace(/^[^\d]*(\d+)[^\d]*$/, "$1"));
+                    // 一共选了多少钱
+                    var all_money = moneylarge + moneySmall;
+
+                    recharge = moneylarge;
+                    givemoney = moneySmall;
+                    $.cookie("rechargeMoney", recharge);
+                    $.cookie("givemoney", givemoney);
+                    document.getElementsByName("allMoney")[0].value = all_money;
+
+                    // 点灰色 清空,点红色不清空
+                    if (this.className.indexOf("face_active") >= 0 == false) {
+                        for (var j = 0; j < faceli.length; j++) {
+                            faceli[j].className = '';
+                        }
+                    }
+                    if (this.className.indexOf("face_active") >= 0) {
+                        // 变灰不充值
+                        this.className = this.className.replace('face_active', '');
+                        document.getElementsByClassName('now_Recharge')[0].value = '请充值';
+                        document.getElementsByClassName('now_Recharge')[0].parentNode.href = 'javascript:;';
+                        console.log(1);
+
+                    } else {
+                        this.className += ' ' + ' face_active';
+                        // 变红充值
+                        document.getElementsByClassName('now_Recharge')[0].value = '立即充值（到账' + all_money + '元）';
+                        document.getElementsByClassName('now_Recharge')[0].parentNode.href = 'pay?ischongzhi=1';
+                        console.log(2);
+                    }
+                }
+            }
+        })();
+        function hrefPay() {
+            if ($.cookie("rechargeMoney")==null) {
+                $.cookie("rechargeMoney", 100);
+            }
+            if ($.cookie("givemoney")==null) {
+                $.cookie("givemoney", 20);
+            }
+            
+            window.location.href = "pay?ischongzhi=1";
+        }
+    </script>
+</body>
+</html>

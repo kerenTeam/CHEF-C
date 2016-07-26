@@ -1,0 +1,146 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>登录</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/signin.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <script src="~/Content/js/jquery.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/Scripts/jquery/jQuery.md5.js"></script>
+    <script>
+        $(function () {
+
+        })
+    </script>
+</head>
+<body class="signin_body po_ab">
+    <div class="signin_t_pic">
+        <img src="/Content/images/denlulogo.png">
+    </div>
+    <form action="" method="">
+        <div class="signin_form">
+            <img src="/Content/images/denyuan.png">
+            <input type="text" id="phone" placeholder="用户名" class="onename" />
+            <p class="am-text-center nameTip am-hide"><span class="am-badge am-badge-danger am-padding-xs am-round">*用户名不能为空</span></p>
+            <input type="password" id="pwd" placeholder="密码" class="sign_password" />
+            <p class="am-text-center pswTip am-hide"><span class="am-badge am-badge-danger am-padding-xs am-round">*密码不能为空</span></p>
+            <input type="button" value="登录" class="sign_btn" />
+        </div>
+        <div class="">
+            <div class="newone">
+                <img src="/Content/images/lefttiao_03.png">
+                <a href="register">创建新的用户</a>
+                <img src="/Content/images/youtiao_03.png">
+            </div>
+            <div class="newone_foot">
+                <label class="am-fl">
+                    <input type="checkbox" name="">
+                    <i>图</i><!-- 自定义复选框缩放作用 -->
+                    <span>记住我 &nbsp; ?</span>
+                </label>
+                <a href="forgetPassword" title="" class="am-fr">忘记密码</a>
+            </div>
+        </div>
+    </form>
+    <!-- 遮罩层 -->
+    <div class="mask">
+        <div class="mask_in"></div>
+        <a href="register" title="">
+            <img src="/Content/images/zhucezhezhao_03.png" alt="">
+        </a>
+    </div>
+    <script type="text/javascript">
+        (function () {
+            var nameTip = document.getElementsByClassName('nameTip')[0];
+            var pswTip = document.getElementsByClassName('pswTip')[0];
+            document.getElementsByClassName('mask')[0].onclick = function () {
+                this.style.display = 'none';
+            }
+            document.getElementsByClassName('sign_btn')[0].onclick = function () {
+                var name = document.getElementsByClassName('onename')[0];
+                var psw = document.getElementsByClassName('sign_password')[0];
+                if (name.value == '') {
+                    name.focus();
+                    nameTip.className = nameTip.className.replace('am-hide', '');
+                    return false;
+                } else {
+                    nameTip.className += ' ' + 'am-hide';
+                }
+                if (psw.value == '') {
+                    psw.focus();
+                    pswTip.className = pswTip.className.replace('am-hide', '');
+                    return false;
+                } else {
+                    pswTip.className += ' ' + 'am-hide';
+                }
+                var phone = $("#phone").val()
+                var pwd = $.md5($("#pwd").val())
+                if (phone.length < 11) {
+                    getAjax("/CommonModule/Q_Users/CookLogin", { phone: phone, pwd: pwd }, function (data) {
+                        if (data == 3) {
+                            //alert("没有这个厨师，请您确认！")
+                            $('.pswTip').removeClass('am-hide').find('span').html('*没有这个厨师，请您确认！');
+                            setTimeout(function () {
+                                $('.pswTip').addClass('am-hide')
+                            }, 3000)
+                            return false;
+                        }
+                        else if (data == 4) {
+                            //alert("您帐号已被锁定")
+                            $('.pswTip').removeClass('am-hide').find('span').html('*您帐号已被锁定!');
+                            setTimeout(function () {
+                                $('.pswTip').addClass('am-hide')
+                            }, 3000)
+                            return false;
+                        }
+                        else if (data == 5) {
+                            //alert("密码错误")
+                            $('.pswTip').removeClass('am-hide').find('span').html('*密码错误');
+                            setTimeout(function () {
+                                $('.pswTip').addClass('am-hide')
+                            },3000)
+                            return false;
+                        }
+                        else if (data == 6) { 
+                            window.location.href = "chefOrderManage";
+                        }
+                        else {
+                            alert(data);
+                        }
+                    })
+                }
+                else {
+                    getAjax("/CommonModule/Q_Users/LoginUser", { phone: phone, pwd: pwd }, function (data) {
+                        if (data == 0) {
+                            //alert("没有这个用户，请您确认！")
+                            $('.pswTip').removeClass(' am-hide').find('span').html('*没有这个用户，请您确认！');
+                            setTimeout(function () {
+                                $('.pswTip').addClass('am-hide')
+                            }, 3000)
+                            return false;
+
+                        } else if (data == 1) {
+                            //alert("密码错误")
+                            $('.pswTip').removeClass(' am-hide').find('span').html('*密码错误');
+                            setTimeout(function () {
+                                $('.pswTip').addClass('am-hide')
+                            }, 3000)
+                            return false;
+
+                        } else if (data == 2) {
+                            window.location.href = "personal"
+                        }
+                        else {
+                            alert(data);
+                        }
+                    })
+                }
+            }
+        })();
+    </script>
+</body>
+</html>

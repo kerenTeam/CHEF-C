@@ -1,0 +1,237 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/layout.css">
+    <script src="/Content/js/jquery.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script>
+        
+        $(function () {
+            var waiter = "";
+            var waiters;
+            if ($.cookie("Waiter") != null) {
+                waiter = $.cookie("Waiter");
+                waiters = eval('(' + waiter + ')');
+                $.each(waiters, function (i) {
+                    if (waiters[i].FoodId == 1) {
+                        $("#waiter1").val(waiters[i].Number)
+                    }
+                    else {
+                        $("#waiter0").val(waiters[i].Number)
+                    }
+                })
+            }
+            Banner();//加载服图banner
+            Evaluate();//加载评论
+        })
+        //加载服图banner
+        function Banner() {
+            var str = "";
+            AjaxJson("/CommonModule/Q_Banner/getImg", { address: 2 }, function (data) {
+                $.each(data, function (i) {
+                    str += "<li><a><img src='" + data[i].img + "' class='am-img-responsive card' alt=\"<?=$val['name']?>\"></a></li>";
+                })
+                $("#banner").html(str);
+            })
+        }
+
+        //加载评论
+        function Evaluate() {
+            var str = "";
+            var img = "";
+            var pinglunnumber = 0;
+            AjaxJson("/CommonModule/Q_SingleFoodEvaluate/getWaiterEvaluate", {}, function (data) {
+                $.each(data, function (i) {
+                    var foodscore = "";
+                    if (data[i].username == null) {
+                        data[i].username = data[i].userphone;
+                    }
+                    if (data[i].userimage == null) {
+                        data[i].userimage = "/Content/img/userimg_03.gif";
+                    }
+                    for (var j = 0; j < data[i].foodscore; j++) {
+                        foodscore += "<i class='am-icon-heart'></i>";
+                    }
+                    str += "<div class='commentList am-cf'><div class='am-u-sm-2 am-center'><img src='" + data[i].userimage + "' class='am-circle comtimg' alt=''></div><div class='am-u-sm-10'><div class='am-comment-meta'><a href='javascript:;' class='am-comment-author'>" + data[i].username + "<span class='am-badge am-badge-danger am-margin-left-xs am-radius'>VIP</span></a><time class='am-fr'>" + data[i].createtime.substring(0, 10) + "</time></div><div class='am-padding-vertical-xs am-padding-horizontal am-text-xs'><div class='cent'>打分：<span id='dafen'>" + foodscore + "</span></div><div style='word-break: break-all;'>" + data[i].comment + "</div></div><ul data-am-widget='gallery' class='am-gallery am-avg-sm-4 am-gallery-default' id='foodevaluateimg' data-am-gallery='{ pureview: true }'>";
+                    pinglunnumber++;
+                    //拿到评论主键获取评论图片
+                    AjaxJson("/CommonModule/Q_SingleFoodImg/getSingleImg", { singlefoodid: data[i].id }, function (ImgJson) {
+                        img = "";
+                        $.each(ImgJson, function (j) {
+                            img += "<li><div class='am-gallery-item'><a href=\"<?=IP.$val['address']?>\" class=''><img src='" + ImgJson[j].address + "' /></a></div></li>";
+                        })
+                    })
+                    $("#pinglunnumber").html(pinglunnumber)
+                    str = str + img + "</ul></div></div>";
+                })
+
+                $("#pinglun").html(str);
+                //$("#foodevaluateimg").html(img);
+            })
+        }
+    </script>
+</head>
+
+<body class="bwhite">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform bheader">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            服务
+        </h1>
+    </header>
+    <!-- banner -->
+    <div data-am-widget="slider" class="am-slider am-slider-default" data-am-slider='{}'>
+        <ul class="am-slides" id="banner">
+            <li><a href=""><img src="/Content/img/food.png" class="am-img-responsive card" alt="<?=$val['name']?>"></a></li>
+            <li>
+                <a href=""><img src="/Content/img/food.png" class="am-img-responsive card" alt="<?=$val['name']?>"></a>
+            </li>
+            <li>
+                <a href=""><img src="/Content/img/food.png" class="am-img-responsive card" alt="<?=$val['name']?>"></a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="serviceDiv">
+        <h2>服务理念</h2>
+        <p class="serviceP">微笑、速度、诚信、技巧、专业</p>
+    </div>
+
+    <hr class="am-article-divider serviceHr">
+
+    <div class="serviceDiv">
+        <h2>服务标准</h2>
+        <p class="serviceP">1．接到跟单安排时，跟单人员积极热情</p>
+        <p class="serviceP">2．客户进入展厅，跟单人员立即微笑迎上去</p>
+        <p class="serviceP">3．跟单人员应主动与客户交流，了解客户需求</p>
+        <p class="serviceP">4．在跟单过程中，应做到热情、周到、大方</p>
+    </div>
+
+    <hr class="am-article-divider serviceHr">
+
+    <div class="serviceDiv">
+        <h2>服务流程</h2>
+        <p class="serviceP">1．迎客—服务员应微笑点头问好</p>
+        <p class="serviceP">2．点菜—详细仔细服务 </p>
+        <p class="serviceP">3．餐桌服务—详细服务顾客的饮食习惯 </p>
+        <p class="serviceP">4．餐后整理—顾客用餐后，服务员善后</p>
+    </div>
+
+    <hr class="am-article-divider serviceHr">
+
+    <div class="serviceDiv">
+        <h2>请选择服务人员 <small class="red am-fr am-padding-right">服务员 80元/人</small></h2>
+
+        <div class="am-g am-text-sm serCtt">
+            <div class="am-u-sm-6 am-center serSex">
+                <img src="/Content/img/sex._03.jpg" class="am-fl" alt="">
+                <span class="">服务员(女)</span>
+                <span class="price am-hide">80</span>
+                <div class="SerNum">
+                    <span class="reduce am-icon-minus-square" onclick="waiterhandle(this, false, 0)"></span>
+                    <input type="text" id="waiter0" class="numTxt" name="numbers[]" onkeydown="keydown(this)" onkeypress="    return IsNum(event)" oninput="waiterueserWrite(this,0)" value="0">
+                    <span class="add am-icon-plus-square" onclick="waiterhandle(this, true,0)"></span>
+                </div>
+            </div>
+            <div class="am-u-sm-6 am-center serSex">
+                <img src="/Content/img/sex._05.png" class="am-fl" alt="">
+                <span class="">服务员(男)</span>
+                <span class="price am-hide">80</span>
+                <div class="SerNum">
+                    <span class="reduce am-icon-minus-square" onclick="waiterhandle(this, false, 1)"></span>
+                    <input type="text" id="waiter1" class="numTxt" name="numbers[]" onkeydown="keydown(this)" onkeypress="    return IsNum(event)" oninput="waiterueserWrite(this,1)" value="0">
+                    <span class="add am-icon-plus-square" onclick="waiterhandle(this, true,1)"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <p class="pbgc">网友点评 <span class="am-fr">(<b id="pinglunnumber"></b>)</span></p>
+    <div id="pinglun">
+        <!-- 文字评论 -->
+        <div class="am-shadow brbp">
+            <header class="am-comment-hd bgno">
+                <!--<h3 class="am-comment-title">评论标题</h3>-->
+                <div class="am-comment-meta">
+                    <a href="javascript:;" class="am-comment-author">
+                        <img src="/Content/img/user.jpg" class="am-circle comimg" alt=""> 张三 <span class="am-badge am-badge-danger am-radius">VIP</span>
+                    </a>
+                    <time datetime="2013-07-27T04:54:29-07:00" class="am-fr">
+                        2012-09-22
+                    </time>
+                </div>
+            </header>
+            <div class="am-padding-vertical-xs am-padding-horizontal am-text-xs">
+                <div class="cent">打分：<i class="am-icon-heart"></i><i class="am-icon-heart"></i><i class="am-icon-heart"></i><i class="am-icon-heart"></i><i class="am-icon-heart"></i></div>
+                好吃是打发打发第三方
+            </div>
+            <ul data-am-widget="gallery" class="am-gallery am-avg-sm-4 am-gallery-default" data-am-gallery="{ pureview: true }">
+                <li>
+                    <div class="am-gallery-item">
+                        <a href="<?=IP.$val['address']?>" class="">
+                            <img src="/Content/img/food.png" />
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="am-gallery-item">
+                        <a href="<?=IP.$val['address']?>" class="">
+                            <img src="/Content/img/food.png" />
+                        </a>
+                    </div>
+                </li>
+                <li>
+                    <div class="am-gallery-item">
+                        <a href="<?=IP.$val['address']?>" class="">
+                            <img src="/Content/img/food.png" />
+                        </a>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft am-no-layout" id="">
+        <div class="am-u-sm-9 a">
+            <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA" style="display: none;">0</span></span>
+            <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0.00</span>
+            <span class="ff am-text-sm gray" style="display: none;">
+                | 包含<span class="am-icon-cny" id="servmoney">0</span>服务费
+                <input type="hidden" id="fee" name="servmoneydata" value="0">
+            </span>
+        </div>
+        <a href="order">
+            <div class="am-u-sm-3 b">
+                <a href="cart">
+                    <button type="button" class="am-btn">去结算</button>
+                </a>
+            </div>
+        </a>
+    </div>
+
+
+
+
+    
+    <script src="/Content/js/amazeui.min.js"></script>
+    <script src="~/Content/js/Waiter_num.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,181 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>账号安全</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/app.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <link href="/Content/css/personal.css" rel="stylesheet">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script src="~/Content/Scripts/jquery/jQuery.md5.js"></script>
+   
+
+</head>
+<body class="paddfoot">
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            账号安全
+        </h1>
+        <div class="am-header-right am-header-nav">
+            <input type="button" name="" onclick="Passaword()" value="保存" class="preservation" />
+        </div>
+    </header>
+    <div class="set_list">
+        <ul>
+            <li class="photo set_list_li">
+                <div class="photo_wrap">
+                    <span class="set_list_le">手机号</span>
+                    <span class="set_list_ri" id="phone"></span>
+                </div>
+            </li>
+            <li class="set_list_li">
+                <div class="photo_wrap">
+                    <span class="set_list_le oldpsw">原密码</span>
+                    <input type="password" id="pwd1" name="" class="set_list_ri" />
+                </div>
+            </li>
+            <li class="set_list_li">
+                <div class="photo_wrap">
+                    <span class="set_list_le newpsw">新密码</span>
+                    <input type="password" id="pwd2" name="" class="set_list_ri" />
+                </div>
+            </li>
+            <li class="set_list_li">
+                <div class="photo_wrap">
+                    <span class="set_list_le newpsw2">确认密码</span>
+                    <input type="password" id="pwd3" name="" class="set_list_ri" />
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <!-- 提示框 -->
+    <div class="tk" style="display:none;">
+        <div class="tkcontent tkvip bwhite" style="background: white;border-radius: 5px;">
+            <div class="tktxt2">
+                <div class="am-text-center am-text-lg am-padding-sm popBg white">提示</div>
+                <div class="am-text-center am-text-lg am-margin">
+                    <div class="red">您确定要删除吗？</div>
+                </div>
+            </div>
+            <div class="btnGp">
+                
+                <button type='button' id="sub" class="bno bred white closem yes">确定</button>
+            </div>
+        </div>
+    </div>
+    <!-- 提示框结束 -->
+    <!-- footer -->
+    <div data-am-widget="navbar" class="am-navbar am-cf am-navbar-default nav-bot">
+        <ul class="am-navbar-nav am-cf am-avg-sm-5 am-shadow">
+            <li>
+                <a href="index">
+                    <span class=""><img src="/Content/img/home1.png" alt=""></span>
+                    <span class="am-navbar-label">首页</span>
+                </a>
+            </li>
+            <li>
+                <a href="cart">
+                    <span class=""><img src="/Content/img/cart1.png" alt=""></span>
+                    <span class="am-navbar-label">购物车</span>
+                </a>
+            </li>
+            <li>
+                <a href="find">
+                    <span class="find">发现</span>
+                </a>
+            </li>
+            <li>
+                <a href="customerService">
+                    <span class=""><img src="/Content/img/kf1.png" alt=""></span>
+                    <span class="am-navbar-label">客服</span>
+                </a>
+            </li>
+            <li>
+                <a href="personal" class="active">
+                    <span class=""><img src="/Content/img/gr2.png" alt=""></span>
+                    <span class="am-navbar-label">我的</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <script src="/Content/js/amazeui.min.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script src="/Content/js/verification.js" type="text/javascript" charset="utf-8" async defer></script>
+    <script>
+    var phone = "";
+    $(function () {
+        getphone();//获取电话
+    })
+
+    function getphone() {
+        getAjax("/CommonModule/Q_Users/getPhone", {}, function (data) {
+            if (data == "0") {
+                alert("请登录")
+                window.location.href = "signin";
+            }
+            else {
+                phone = data;
+                $("#phone").html(phone)
+            }
+        })
+    }
+
+    function Passaword() {
+        var pwd1 = $("#pwd1").val();
+        
+        var reg = /^(?![0-9]+$)(?![a-zA-Z]+$)[0-9A-Za-z]{6,12}$/;
+        if (pwd1 == '') {
+            $('.red')[0].innerHTML = '请输入原密码!'
+            $('.tk')[0].style.display = 'block';
+            return false;
+        }
+        var pwd2 = $("#pwd2").val()
+        var pwd3 = $("#pwd3").val()
+        if (!reg.test(pwd2)) {
+            $('.red')[0].innerHTML = '请输入由数字和英文字母组成的6位数密码!'
+            $('.tk')[0].style.display = 'block';
+            return false;
+        }
+        if (pwd3 != pwd2) {
+            $('.red')[0].innerHTML = '两次输入密码不相同!'
+            $('.tk')[0].style.display = 'block';
+            return false;
+        }
+        else {
+           
+            getAjax("/CommonModule/Q_Users/editPwd", { phone: phone, pwd: $.md5(pwd1), newphone: $.md5(pwd2) }, function (data) {
+                if (data == 1) {
+                   // alert("修改成功")
+                    window.location.href = "personal";
+                }
+                else if (data == 0) {
+                    // alert("修改失败")
+                    $('.red')[0].innerHTML = '修改失败!'
+                    $('.tk')[0].style.display = 'block';
+                }
+                else if (data == 2) {
+                    $('.red')[0].innerHTML = '请输入正确的原密码!'
+                    $('.tk')[0].style.display = 'block';
+                }
+            })
+        }
+    }
+
+    $('.yes')[0].onclick = function () {
+        $('.tk')[0].style.display = 'none'; 
+      //  $('#pwd1').focus();
+    }
+    </script>
+
+</body>
+</html>

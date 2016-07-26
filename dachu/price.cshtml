@@ -1,0 +1,175 @@
+﻿<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/layout.css">
+    <script src="~/Content/js/jquery-2.1.1.min.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        $(function () {
+            getFoodPrice();
+        })
+
+
+        function getFoodPrice() {
+            var str = "";
+            console.log($("#caishi").val());
+            console.log($("#cates").val());
+            
+            var time = $("#adate").val();
+            if (time!=null) {
+                time = time + " 00:00:00";
+            }
+            AjaxJson("/CommonModule/Q_Vegetable/getVegetableByTime", { FoodMarket: $("#caishi").val(), MarketCategorie: $("#cates").val(), time: time }, function (data) {
+                $.each(data, function (i) {
+                    str += "<tr><td><a>" + data[i].name + "</a></td><td>1" + data[i].unit + "</td><td>" + data[i].price + "</td></tr>"
+                })
+                $("#group_one").html(str);
+            })
+        }
+    </script>
+</head>
+
+<body class="bwhite">
+
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform bheader">
+        <div class="am-header-left am-header-nav">
+            <a href="index">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+        菜价
+        </h1>
+    </header>
+    <!-- banner -->
+    <div data-am-widget="slider" class="am-slider am-slider-default" data-am-slider='{}'>
+        <ul class="am-slides">
+            <li>
+                <a href=""><img src="/Content/img/food2.png" class="am-img-responsive card" alt="<?=$val['name']?>"></a>
+            </li>
+            <li>
+                <a href=""><img src="/Content/img/food2.png" class="am-img-responsive card" alt="<?=$val['name']?>"></a>
+            </li>
+            <li>
+                <a href=""><img src="/Content/img/food2.png" class="am-img-responsive card" alt="<?=$val['name']?>"></a>
+            </li>
+        </ul>
+    </div>
+
+
+    <form action="" method="" class="pform">
+        <br>
+        
+        <div class="am-u-sm-4 sbnt">
+            <select data-am-selected="{maxHeight: 100,btnStyle: 'danger'}" name='caishi' id='caishi' onchange="getFoodPrice()">
+                <option value="红旗超市">红旗超市</option>
+                <option value="新佳超市">新佳超市</option>
+                <option value="哈哈超市">哈哈超市</option>
+                <option value="小龙超市">小龙超市</option>
+            </select>
+        </div>
+        <div class="am-u-sm-4 sbnt">
+            <select id='cates' data-am-selected="{maxHeight: 100,btnStyle: 'danger'}" name='cate' onchange="getFoodPrice()">
+                <option value="蔬菜">蔬菜</option>
+                <option value="肉">肉</option>
+                <option value="鱼">鱼类</option>
+                
+                
+            </select>
+        </div>
+        <div class="am-u-sm-4 sbnt">
+            <select id="adate" class="date" data-am-selected="{maxHeight: 100,btnStyle: 'danger'}" name='date' onchange="getFoodPrice()">
+                
+            </select>
+        </div>
+        <br>
+    </form>
+    <div class="ptahr"></div>
+    <table class="am-table am-shadow pta">
+        <thead>
+            <tr>
+                <th>菜名</th>
+                <th>重量</th>
+                <th>价格</th>
+            </tr>
+        </thead>
+        <tbody id='group_one'>
+        </tbody>
+    </table>
+
+
+<script src="/Content/js/jquery.min.js"></script>
+<script src="/Content/js/amazeui.min.js"></script>
+<script>
+     $(function(){
+         var adate = $('#adate');
+         var html;//定义selec追加的html元素
+         var now = new Date();
+     
+      for(var i=0;i<7;i++){
+          var date = new Date(now.getTime() - i * 24 * 3600 * 1000);//循环得出每天的日期
+          var month = date.getMonth() + 1;
+          var day = date.getDate();
+          var year = date.getFullYear(); 
+          html+= '<option value="'+year+'-'+month+'-'+day+'">'+year+'-'+month+'-'+day+'</option>';
+         adate.html(html);
+      }
+    
+     })
+</script>
+<script>
+$(function(){
+      var cai =  $("#caishi").val();
+      var time =  $("#adate").val();
+      var cate =  $("#cates").val();
+      if(!time){
+        var time = show();
+      }
+      // $.ajax({
+      //   type:'POST',
+      //   url:"<?=site_url('pricesearch/caiprice')?>",
+      //   data: "name="+cai+"&time="+time+'&cates='+cate,
+      //   success: function (data) {
+      //       $('#group_one').html(data);
+      //      }
+
+      // });
+})
+  function show(){
+   var mydate = new Date();
+   var str = "" + mydate.getFullYear() + "-";
+   str += (mydate.getMonth()+1) + "-";
+   str += mydate.getDate();
+   return str;
+  }
+function getoption(){
+      var cai =  $("#caishi").val();
+      var cate =  $("#cates").val();
+      var time =  $("#adate").val();
+      // $.ajax({
+      //   type:'POST',
+      //   url:"<?=site_url('pricesearch/caiprice')?>",
+      //   data: "name="+cai+"&time="+time+'&cates='+cate,
+      //   success: function (data) {
+      //       $('#group_one').html(data);
+      //      }
+
+      // });
+    } 
+</script>
+</body>
+
+</html>

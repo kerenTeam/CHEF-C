@@ -1,0 +1,117 @@
+﻿<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="description" content="办酒碗">
+    <meta name="keywords" content="办酒碗">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
+    <title>办酒碗</title>
+    <meta name="renderer" content="webkit">
+    <meta name="format-detection" content="telephone=no" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <link rel="stylesheet" href="/Content/css/amazeui.min.css">
+    <link rel="stylesheet" href="/Content/css/app.css">
+    <link rel="stylesheet" href="/Content/css/layout.css">
+    <script src="/Content/js/jquery.min.js"></script>
+    <script src="~/Content/js/jquery.cookie.js"></script>
+    <script src="~/Content/Scripts/kerenui-framework.js"></script>
+    <script>
+        var id = GetQuery("id");
+        var cele = "";
+        var celes;
+        if ($.cookie("Cele") != null) {
+            cele = $.cookie("Cele");
+            celes = eval('(' + cele + ')');
+        }
+        $(function () {
+            $("#celeid").val(id);
+            DetailsInfo();//加载庆典详情器械
+        })
+        //加载庆典详情器械
+        function DetailsInfo() {
+            var str = "";
+            var indexnumber = 1;
+            var imgs = "";
+            AjaxJson("/CommonModule/Q_celeCategory/GetCategoryAll", {}, function (data) {
+                $.each(data, function (i) {
+                    str += "<dl class='am-accordion-item dlMar nobor' ><dt class='am-padding-sm nobor am-vertical-align'><img src='/Content/img/marks.png' class='marks' alt=''> <strong class='am-vertical-align-middle'>" + data[i].name + "</strong></dt><dd class='am-accordion-bd am-collapse am-in'><div class='am-accordion-content'><ul class='am-list cul am-text-md'><li class='am-g am-list-item-desced am-list-item-thumbed am-list-item-thumb-left black'><input type='hidden' name='zu[]' value='1'/><input type='hidden' name='detailsname' value='紫色梦幻'/>";
+                    AjaxJson("/CommonModule/Q_details/getdetailsByCategoryId", { CategoryId: data[i].id }, function (details) {
+                        imgs = ""
+                        indexnumber = 1;
+                        $.each(details, function (j) {
+                            if (cele.length > 5) {
+                                var number = 0;
+                                $.each(celes, function (k) {
+                                    if (details[j].id == celes[k].FoodId) {
+                                        number = celes[k].Number;
+                                    }
+                                })
+                                imgs += "<div class='am-g gsf'><div class='am-u-sm-5'>" + indexnumber + "、" + details[j].name + "</div><div class='am-u-sm-7 am-text-right'><span>" + details[j].unit + "</span> <span class='price red am-icon-cny'>" + details[j].price + ".00</span>&nbsp;&nbsp;<div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='celehandle(this, false,\"" + details[j].id + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='celeueserWrite(this,\"" + details[j].id + "\")' value='" + number + "'><span class='add am-icon-plus-square' onclick='celehandle(this, true,\"" + details[j].id + "\")'></span></div></div></div>";
+                                indexnumber++;
+                            }
+                            else {
+                                imgs += "<div class='am-g gsf'><div class='am-u-sm-5'>" + indexnumber + "、" + details[j].name + "</div><div class='am-u-sm-7 am-text-right'><span>" + details[j].unit + "</span> <span class='price red am-icon-cny'>" + details[j].price + ".00</span>&nbsp;&nbsp;<div class='fNum'><span></span><span></span><span class='reduce am-icon-minus-square' onclick='celehandle(this, false,\"" + details[j].id + "\")'></span><input type='text' class='numTxt' name='numbers[]' onkeydown='keydown(this)' onkeypress='return IsNum(event)' oninput='celeueserWrite(this,\"" + details[j].id + "\")' value='" + details[j].defaultnumber + "'><span class='add am-icon-plus-square' onclick='celehandle(this, true,\"" + details[j].id + "\")'></span></div></div></div>";
+                                indexnumber++;
+                            }
+                        })
+                    })
+                    indexnumber = indexnumber + 1;
+                    str = str + imgs;
+                    str = str + "</li></ul></div></dd></dl>";
+                })
+                $("#Category").html(str);
+            })
+        }
+        function hrefOrder() {
+            window.location.href = "cart";
+        }
+
+    </script>
+</head>
+
+<body>
+    <!-- header -->
+    <header data-am-widget="header" class="am-header am-header-default topform bheader">
+        <div class="am-header-left am-header-nav">
+            <a href="javascript:history.go(-1)" style="margin-top: 15px;">
+                <i class="am-header-icon am-icon-chevron-left"></i>
+            </a>
+        </div>
+        <h1 class="am-header-title">
+            主题一
+        </h1>
+    </header>
+    <input id="celeid" type="hidden" />
+    <!-- banner -->
+    <div class="contactCus">
+        <img src="/Content/images/pagebg._02.jpg">
+    </div>
+    <div class="contactKong">
+        <a class="contactGo" href="customerService">
+            <strong class="am-text-lg">晕了吗？</strong><br><small class="am-text-md">联系客服</small>
+        </a>
+    </div>
+
+    <!-- 价格详情 -->
+    <section class="am-accordion am-accordion-gapped sec-margin pageCtt" id="Category"></section>
+
+    <div data-am-widget="navbar" class="am-navbar am-shadow am-cf am-navbar-default amft am-no-layout" id="">
+        <div class="am-u-sm-9 a">
+            <span class="green am-posR"><img src="/Content/img/cart.png" id="car" alt=""><span id="fen" class="allmoney cartA" style="display: none;">0</span></span>
+            <i class="am-icon-cny red"></i><span id="allmoney" class="allmoney red">0.00</span>
+            <span class="ff am-text-sm gray" style="display: none;">
+                | 包含<span class="am-icon-cny" id="servmoney">0</span>服务费
+                <input type="hidden" id="fee" name="servmoneydata" value="0">
+            </span>
+        </div>
+        <div class="am-u-sm-3 b" style="margin-top:4.5%;">
+            <button type="button" onclick="hrefOrder() " class="am-btn">去结算</button>
+        </div>
+    </div>
+
+
+    <script src="/Content/js/amazeui.min.js"></script>
+    <script src="/Content/js/Cele_num.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,262 @@
+﻿<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <title>浏览器定位</title>
+    <link rel="stylesheet" href="http://cache.amap.com/lbs/static/main1119.css"/>
+    <link href="/Content/css/amazeui.min.css" rel="stylesheet">
+    <link href="/Content/css/app.css" rel="stylesheet">
+    <link href="/Content/css/public.css" rel="stylesheet">
+    <link href="/Content/css/personal.css" rel="stylesheet">
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=61eb3dd738aebf40b63eacbf3c447bdf"></script>
+    <script type="text/javascript" src="http://webapi.amap.com/maps?v=1.3&key=61eb3dd738aebf40b63eacbf3c447bdf&plugin=AMap.Geocoder"></script>
+    <script type="text/javascript" src="http://cache.amap.com/lbs/static/addToolbar.js"></script>
+    <script src="/Content/js/jquery.min.js"></script>
+    <style type="text/css">
+
+        .am-header .adrHead{margin: 0 8% 0 15%;}
+        input[type=text].adrSearch{margin: 8px 0; font-size: 1rem;text-align: content;}
+        .adrSearchShade{
+            position: absolute;width: 100%;height: 100%;background-color: #fff;z-index: 9;display: none;
+        }
+        .searchResultPanel{
+            margin-top: 49px;
+            padding: 0 5px;
+        }
+        .adrMenu ul{
+            border-top: 2px solid #ccc;
+            border-bottom: 2px solid #ccc;
+        }
+        .adrMenu ul li{
+            padding: 1rem 0;
+            margin-bottom: -2px;
+            border-bottom: 3px solid transparent;
+        }
+        .adrMenu ul li.active{
+            border-bottom: 3px solid #d72d22;
+            color: #d72d22;
+        }
+        #container{
+            height: 35%;
+            position: static;
+        }
+        .amap-touch-toolbar .amap-zoomcontrol,.amap-copyright{
+            display: none;
+        }
+        #panel ul li{
+            padding: 1rem 1rem 0 1rem;
+        }
+        .addrList{
+            border-bottom: 1px solid #ccc;
+        }
+        .addrList h2{
+            font-size: 1.8rem;
+            margin: 0 0 0.8rem 0;
+        }
+        .addrList p{
+            font-size: 1.5rem;
+            margin: 0 0 .8rem 0;
+        }
+    </style>
+<body>
+<header data-am-widget="header"class="am-header am-header-default bheader" style="width:100%;height: 49px;"> 
+  <div class="am-header-left am-header-nav">
+    <a href="javascript:history.go(-1)">
+      <i class="am-header-icon am-icon-chevron-left"></i>
+    </a>
+  </div>
+  <h1 class="am-header-title adrHead"><input onfocus="onShade();" class="adrSearch am-form-field am-radius" type="text" placeholder="小区 / 写字楼 / 学校等"></h1>
+</header>
+<div id='container'></div>
+<!-- <div id="tip"></div> -->
+<div class="adrMenu">
+        <ul class="am-avg-sm-4 am-text-center">
+            <li class="active">全部</li>
+            <li>写字楼</li>
+            <li>小区</li>
+            <li>学校</li>
+        </ul>
+    </div>
+<div id="addr"></div>
+<div id="panel">
+    <ul>
+        <li class="">
+            <div class="am-cf addrList">
+                <i class="am-icon-map-marker am-fl red am-text-xl"></i>
+                <div class="am-fl am-margin-left-lg">
+                    <h2><span class="red">[当前]</span>府河音乐花园</h2>
+                    <p>双流县华府大道一段599</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <ul class="am-hide">
+        <li class="">
+            <div class="am-cf addrList">
+                <i class="am-icon-map-marker am-fl red am-text-xl"></i>
+                <div class="am-fl am-margin-left-lg">
+                    <h2><span class="red">[当前]</span>府河音乐花园</h2>
+                    <p>双流县华府大道一段599</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <ul class="am-hide">
+        <li class="">
+            <div class="am-cf addrList">
+                <i class="am-icon-map-marker am-fl red am-text-xl"></i>
+                <div class="am-fl am-margin-left-lg">
+                    <h2><span class="red">[当前]</span>府河音乐花园</h2>
+                    <p>双流县华府大道一段599</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <ul class="am-hide">
+        <li class="">
+            <div class="am-cf addrList">
+                <i class="am-icon-map-marker am-fl red am-text-xl"></i>
+                <div class="am-fl am-margin-left-lg">
+                    <h2><span class="red">[当前]</span>府河音乐花园</h2>
+                    <p>双流县华府大道一段599</p>
+                </div>
+            </div>
+        </li>
+    </ul>
+</div>
+<script type="text/javascript">
+    function offShade(){
+        $('.adrSearchShade').css('display','none');
+    }
+
+    function onShade(){
+        $('.adrSearchShade').css('display','block').find('input').focus();
+    }
+
+    $('.adrMenu li').click(function(){
+        $(this).addClass('active').siblings().removeClass('active');
+        var index = $(this).index();
+        $('#panel ul').eq(index).removeClass('am-hide').siblings().addClass('am-hide')
+    });
+
+
+
+    var map, geolocation,acrrentTit,currentAddr;
+    //加载地图，调用浏览器定位服务
+    map = new AMap.Map('container', {
+        resizeEnable: true,
+    });
+    map.plugin('AMap.Geolocation', function() {
+        geolocation = new AMap.Geolocation({
+            enableHighAccuracy: true,//是否使用高精度定位，默认:true
+            timeout: 10000,          //超过10秒后停止定位，默认：无穷大
+            buttonOffset: new AMap.Pixel(10, 20),//定位按钮与设置的停靠位置的偏移量，默认：Pixel(10, 20)
+            zoomToAccuracy: true,      //定位成功后调整地图视野范围使定位位置及精度范围视野内可见，默认：false
+            buttonPosition:'RB',
+        });
+        map.addControl(geolocation);
+        geolocation.getCurrentPosition();
+        AMap.event.addListener(geolocation, 'complete', onComplete);//返回定位信息
+        AMap.event.addListener(geolocation, 'error', onError);      //返回定位出错信息
+    });
+    //解析定位结果
+    function onComplete(data) {
+        var str=['定位成功'];
+        str.push('经度：' + data.position.getLng());
+        str.push('纬度：' + data.position.getLat());
+        str.push('精度：' + data.accuracy + ' 米');
+        str.push('是否经过偏移：' + (data.isConverted ? '是' : '否'));
+        // document.getElementById('tip').innerHTML = str.join('<br>');
+        var center = [data.position.getLng(),data.position.getLat()];
+        var centerStr = data.position.getLng()+','+data.position.getLat();
+        console.log(center);
+        regeocoder(center);
+        zhoubian(center,'汽车服务|汽车销售|汽车维修|摩托车服务|餐饮服务|购物服务|生活服务|体育休闲服务|医疗保健服务|住宿服务|风景名胜|商务住宅|政府机构及社会团体|科教文化服务|交通设施服务|金融保险服务|公司企业|道路附属设施|公共设施',0);
+        zhoubian(center,'政府机构及社会团体',1);
+        zhoubian(center,'住宿服务|商务住宅',2);
+        zhoubian(center,'科教文化服务',3);
+    }
+    //解析定位错误信息
+    function onError(data) {
+        document.getElementById('tip').innerHTML = '定位失败';
+    }
+
+    // 逆向地理编码
+    // lnglatXY = [116.396574, 39.992706]; //已知点坐标
+    function regeocoder(lnglatXY) {  //逆地理编码
+        var geocoder = new AMap.Geocoder({
+            radius: 1000,
+            extensions: "all"
+        });        
+        geocoder.getAddress(lnglatXY, function(status, result) {
+            if (status === 'complete' && result.info === 'OK') {
+                geocoder_CallBack(result);
+            }
+        });        
+        var marker = new AMap.Marker({  //加点
+            map: map,
+            position: lnglatXY
+        });
+        map.setFitView();
+    }
+    function geocoder_CallBack(data) {
+        var address = data.regeocode.formattedAddress; //返回地址描述
+        console.log(data.regeocode)
+        document.getElementById("addr").innerHTML = address;
+        acrrentTit = data.regeocode.addressComponent.neighborhood
+        currentAddr = data.regeocode.addressComponent.district+data.regeocode.addressComponent.street+data.regeocode.addressComponent.township+data.regeocode.addressComponent.streetNumber;
+        console.log(currentAddr)
+    }
+
+    // 周边检索
+    function zhoubian(center,zType,index){
+        //加载PlaceSearch服务插件
+        AMap.service(["AMap.PlaceSearch"], function() {
+            var placeSearch = new AMap.PlaceSearch({ //构造地点查询类
+            pageSize: 10,
+            type: zType,
+            pageIndex: 1,
+            // city: "010", //城市
+            map: map,
+            extensions: 'all'
+        });
+
+        placeSearch.searchNearBy('', center, 200, function(status, result) {
+            var _ul = document.getElementById('panel').getElementsByTagName('ul');
+            var addrList = result.poiList.pois;
+            console.log(result.poiList.pois)
+            var str = '';
+            str += '<li class="">'+
+                        '<div class="am-cf addrList">'+
+                            '<i class="am-icon-map-marker am-fl red am-text-xl"></i>'+
+                            '<div class="am-margin-left-lg">'+
+                                '<h2><span class="red">['+ acrrentTit +']</span></h2>'+
+                                '<p>'+ currentAddr +'</p>'+
+                            '</div>'+
+                        '</div>'+
+                    '</li>'
+            for(var i = 0;i < addrList.length;i++){
+                var addr = addrList[i];
+                str +=  '<li class="">'+
+                        '<div class="am-cf addrList">'+
+                            '<i class="am-icon-map-marker am-fl red am-text-xl"></i>'+
+                            '<div class="am-margin-left-lg">'+
+                                '<h2>'+ addr.name +'</h2>'+
+                                '<p>'+ addr.adname + addr.address +'</p>'+
+                            '</div>'+
+                        '</div>'+
+                    '</li>'
+            }
+            _ul[index].innerHTML = str;
+            str = '';
+        });
+        });
+    }
+
+
+
+</script>
+</body>
+</html>

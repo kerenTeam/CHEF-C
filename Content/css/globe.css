@@ -1,0 +1,191 @@
+ul,
+p,
+li,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    list-style: none;
+}
+
+
+/* 晒单 */
+
+.share_order li:last-child {
+    border-bottom: 0;
+}
+
+.share_order li {
+   list-style: none;
+    box-sizing: border-box;
+    padding: 3%;
+    position: relative;
+    background-color: rgb(255, 255, 255); 
+    border-top: 1px solid rgb(238, 238, 238);
+    width: 94%;
+    margin: 0 3%;
+}
+.share_order li:last-child{
+ border-bottom: 1px solid rgb(238, 238, 238);
+}
+.share_order li:after {
+    content: '';
+    display: block;
+    clear: both;
+}
+
+.share_left {
+    width: 25%;
+    float: left;
+}
+
+.share_right {
+    width: 75%;
+    float: left;
+    padding-left: 2%;
+}
+
+.share_right a {
+    position: absolute;
+    right: 4%;
+    bottom: 10%;
+    color: #F85554;
+    border: 1px solid #F85554;
+    border-radius: 5px;
+    padding: 0 1%;
+    font-size: 1.5rem;
+}
+
+.share_right p {
+    font-size: 1.5rem;
+}
+
+.share_left img {
+    width: 100%;
+}
+
+
+/* 打分 */
+
+#AddDP {
+    padding: 2% 3%;
+}
+
+#AddDP h3,
+.clist_ul li {
+        font-size: 1.6rem;
+    font-weight: normal;
+    line-height: 2.5rem;
+    width: 90%;
+    margin: 0 5%;
+}
+
+.clist_ul li .Select {
+    width: 50%;
+    display: inline-block;
+   margin-left:2rem;
+}
+
+.clist_ul li .Select>a {
+    width: 1.5rem;
+    display: inline-block;
+}
+
+.clist_ul li .Select>a img {
+    width: 100%;
+}
+
+.comment_pic,
+.infos {
+    margin-top: 1rem;
+    background-color: #fff;
+}
+
+.comment_pic .comment_pic_t {
+    width: 100%;
+    border: 0;
+    outline: none;
+    padding: 2% 3%;
+    resize: none;
+}
+
+.infos {
+    padding: 2% 3%;
+    margin-bottom: 3rem;
+}
+
+.infos h3 {
+    line-height: 3rem;
+    font-size: 1.6rem;
+}
+
+.infos ul li {
+    line-height: 2.5rem;
+}
+
+#commentform {
+    font-family: "Segoe UI", "Lucida Grande", Helvetica, Arial, "Microsoft YaHei", FreeSans, Arimo, "Droid Sans", "wenquanyi micro hei", "Hiragino Sans GB", "Hiragino Sans GB W3", FontAwesome, sans-serif;
+}
+
+.status_bar,
+#preview,
+.single_main {
+    border: 0 !important;
+}
+
+#status_info {
+    display: none;
+}
+
+.single_main {
+    position: relative;
+}
+
+.single_main .btns {
+    position: absolute;
+    left: -10px;
+    top: 75px;
+}
+
+.single_main .btns .upload_btn {
+    background: none;
+    color: #000;
+    background: none;
+    color: #000;
+    margin-top: 6px;
+    text-shadow: 1px 1px #ccc;
+}
+
+.status_bar {
+    height: 0 !important;
+}
+
+.upload_box {
+    margin: 0 !important;
+}
+
+.upload_submit {
+    padding: 0 0 20px 0 !important;
+}
+
+.comment_pic {
+    position: relative;
+}
+
+.publish { 
+    border: none;
+    background-color: rgb(215, 45, 34);
+    color: rgb(255, 255, 255);
+    padding: 0.4rem 1rem;
+    border-radius: 5px; 
+    margin: 10rem auto 10rem;
+    display: inherit;
+
+}
